@@ -8,6 +8,9 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Checkout from './pages/Checkout';
+import ProductDetails from './pages/ProductDetails';
+import OrderConfirmation from './pages/OrderConfirmation';
+import MyOrders from './pages/MyOrders';
 
 // ScrollToTop component to ensure new routes start at the top
 function ScrollToTop() {
@@ -55,6 +58,9 @@ function App() {
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
               <Route path="checkout" element={<Checkout />} />
+              <Route path="product/:id" element={<ProductDetails />} />
+              <Route path="order/:id" element={<OrderConfirmation />} />
+              <Route path="orders" element={<MyOrders />} />
             </Route>
           </Routes>
         </BrowserRouter>

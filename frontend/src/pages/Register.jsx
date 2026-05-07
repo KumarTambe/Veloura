@@ -3,16 +3,19 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 
-export default function Login() {
+export default function Register() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(email, password);
-    navigate('/');
+    const success = await register(email, password, name);
+    if (success) {
+      navigate('/');
+    }
   };
 
   return (
@@ -24,11 +27,21 @@ export default function Login() {
         className="w-full max-w-md p-8"
       >
         <div className="text-center mb-12">
-          <h1 className="text-2xl font-serif text-white tracking-[0.3em] mb-4">SIGN IN</h1>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">Access your curated collection</p>
+          <h1 className="text-2xl font-serif text-white tracking-[0.3em] mb-4">REGISTER</h1>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">Join the exclusive circle</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
+          <div>
+            <label className="block text-[9px] uppercase tracking-[0.3em] text-white/50 mb-3">Full Name</label>
+            <input 
+              type="text" 
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full bg-transparent border-b border-white/20 pb-2 text-white text-sm outline-none focus:border-white transition-colors"
+            />
+          </div>
           <div>
             <label className="block text-[9px] uppercase tracking-[0.3em] text-white/50 mb-3">Email Address</label>
             <input 
@@ -55,15 +68,15 @@ export default function Login() {
               type="submit" 
               className="w-full py-4 bg-white text-black text-[10px] uppercase tracking-[0.3em] font-semibold hover:bg-luxury-gold hover:text-white transition-all duration-300"
             >
-              Sign In
+              Create Account
             </button>
           </div>
         </form>
 
         <div className="mt-12 text-center border-t border-white/10 pt-8">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-4">Don't have an account?</p>
-          <Link to="/register" className="text-xs text-white border-b border-white/30 pb-1 hover:border-white transition-colors">
-            Create Account
+          <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-4">Already have an account?</p>
+          <Link to="/login" className="text-xs text-white border-b border-white/30 pb-1 hover:border-white transition-colors">
+            Sign In
           </Link>
         </div>
       </motion.div>
