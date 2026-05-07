@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -44,19 +44,28 @@ export default function CartDrawer() {
                 </div>
               ) : (
                 cartItems.map((item) => (
-                  <div key={item.id} className="flex gap-4 pb-6 border-b border-white/5">
+                  <div key={item._id} className="flex gap-4 pb-6 border-b border-white/5">
                     <div className="w-20 h-24 bg-luxury-black overflow-hidden flex-shrink-0">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover opacity-80" />
+                      <img 
+                        src={item.images && item.images.length > 0 ? item.images[0] : ''} 
+                        alt={item.name} 
+                        className="w-full h-full object-cover opacity-80" 
+                      />
                     </div>
                     <div className="flex flex-col justify-between flex-1">
                       <div>
                         <h3 className="text-sm font-serif text-white tracking-wider">{item.name}</h3>
-                        <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mt-1">{item.desc}</p>
+                        <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mt-1">
+                          {item.category || item.brand}
+                        </p>
+                        <p className="text-[10px] text-white/30 mt-1">Qty: {item.quantity}</p>
                       </div>
                       <div className="flex justify-between items-end">
-                        <p className="text-xs font-mono text-white/80">{item.price}</p>
+                        <p className="text-xs font-mono text-white/80">
+                          ${item.price?.toLocaleString()}
+                        </p>
                         <button 
-                          onClick={() => removeFromCart(item.id)}
+                          onClick={() => removeFromCart(item._id)}
                           className="text-[9px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors border-b border-transparent hover:border-white/30"
                         >
                           Remove

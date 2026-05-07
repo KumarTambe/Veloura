@@ -9,7 +9,7 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { cartCount, setIsCartOpen } = useCart();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,10 +52,24 @@ export default function Navigation() {
 
           {/* Icons/Links (Right) */}
           <div className="flex items-center justify-end space-x-8 w-1/3">
-            <Link to={user ? "#" : "/login"} className="hidden md:flex items-center gap-2 text-white/50 hover:text-white transition-colors">
-              <User size={16} strokeWidth={1.5} />
-              {user && <span className="text-[10px] uppercase tracking-widest">{user.name}</span>}
-            </Link>
+            {user ? (
+              <div className="hidden md:flex items-center gap-4">
+                <div className="flex items-center gap-2 text-white/50">
+                  <User size={16} strokeWidth={1.5} />
+                  <span className="text-[10px] uppercase tracking-widest">{user.username}</span>
+                </div>
+                <Link to="/orders" className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
+                  Orders
+                </Link>
+                <button onClick={logout} className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link to="/login" className="hidden md:flex items-center gap-2 text-white/50 hover:text-white transition-colors">
+                <User size={16} strokeWidth={1.5} />
+              </Link>
+            )}
             <button className="text-white/50 hover:text-white transition-colors">
               <Search size={16} strokeWidth={1.5} />
             </button>
