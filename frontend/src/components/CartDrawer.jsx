@@ -62,7 +62,7 @@ export default function CartDrawer() {
                       </div>
                       <div className="flex justify-between items-end">
                         <p className="text-xs font-mono text-white/80">
-                          ${item.price?.toLocaleString()}
+                          ₹{item.price?.toLocaleString()}
                         </p>
                         <button 
                           onClick={() => removeFromCart(item._id)}
@@ -82,7 +82,7 @@ export default function CartDrawer() {
               <div className="p-6 bg-luxury-black border-t border-white/10">
                 <div className="flex justify-between mb-6">
                   <span className="text-[10px] uppercase tracking-[0.2em] text-white/50">Subtotal</span>
-                  <span className="text-sm font-mono tracking-wider">${cartTotal.toLocaleString()}</span>
+                  <span className="text-sm font-mono tracking-wider">₹{cartTotal.toLocaleString()}</span>
                 </div>
                 <button 
                   onClick={() => {

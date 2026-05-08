@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, ArrowRight } from 'lucide-react';
 
 export default function SmartSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Keyboard shortcut to open search (CMD/CTRL + K)
   useEffect(() => {
@@ -15,9 +18,41 @@ export default function SmartSearch() {
       }
       if (e.key === 'Escape') setIsOpen(false);
     };
+
+    // Global listener for search trigger
+    const handleOpenSearch = () => setIsOpen(true);
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('openSearch', handleOpenSearch);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('openSearch', handleOpenSearch);
+    };
   }, []);
+
+  // Fetch results when query changes
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (query.trim().length < 2) {
+        setResults([]);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/products?search=${query}`);
+        const data = await res.json();
+        setResults(data.products || []);
+      } catch (error) {
+        console.error('Search error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const timer = setTimeout(fetchResults, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const suggestions = ['Royal Oak', 'Tourbillon', 'Rose Gold', 'Skeleton Dial', 'Chronograph'];
 
@@ -58,7 +93,7 @@ export default function SmartSearch() {
                 </button>
               </div>
 
-              {query.length === 0 ? (
+              {query.length < 2 ? (
                 <div className="pt-6">
                   <h3 className="text-xs uppercase tracking-widest text-white/40 mb-4 font-sans">Trending Suggestions</h3>
                   <div className="flex flex-wrap gap-2">
@@ -75,20 +110,35 @@ export default function SmartSearch() {
                 </div>
               ) : (
                 <div className="pt-6">
-                  <h3 className="text-xs uppercase tracking-widest text-white/40 mb-4 font-sans">Results for "{query}"</h3>
-                  <div className="space-y-2">
-                    {[1, 2, 3].map((_, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 hover:bg-white/5 rounded-lg cursor-pointer group transition-colors">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-white/10 rounded-md"></div>
-                          <div>
-                            <h4 className="font-serif text-white group-hover:text-luxury-gold transition-colors">Veloura Model X{i+1}</h4>
-                            <p className="text-sm text-white/50">Titanium • 42mm</p>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xs uppercase tracking-widest text-white/40 font-sans">Results for "{query}"</h3>
+                    {loading && <div className="w-4 h-4 border-2 border-luxury-gold border-t-transparent rounded-full animate-spin"></div>}
+                  </div>
+                  
+                  <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {!loading && results.length === 0 ? (
+                      <p className="text-white/30 text-sm italic py-4 text-center font-serif">No timepieces found matching your search.</p>
+                    ) : (
+                      results.map((product) => (
+                        <Link 
+                          key={product._id} 
+                          to={`/product/${product._id}`}
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center justify-between p-3 hover:bg-white/5 rounded-lg cursor-pointer group transition-colors"
+                        >
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-luxury-charcoal rounded-md overflow-hidden">
+                              <img src={product.images?.[0]} alt={product.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                            <div>
+                              <h4 className="font-serif text-white group-hover:text-luxury-gold transition-colors">{product.name}</h4>
+                              <p className="text-[10px] uppercase tracking-widest text-white/40">{product.brand} • ₹{product.price?.toLocaleString()}</p>
+                            </div>
                           </div>
-                        </div>
-                        <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-white group-hover:translate-x-1 transition-all" />
-                      </div>
-                    ))}
+                          <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                        </Link>
+                      ))
+                    )}
                   </div>
                 </div>
               )}

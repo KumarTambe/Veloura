@@ -113,7 +113,7 @@ export default function MyOrders() {
                         </div>
                         <div className="text-right">
                           <p className="text-[9px] uppercase tracking-[0.2em] text-white/30 mb-2">Total</p>
-                          <p className="text-lg font-mono text-white">${order.totalPrice?.toLocaleString()}</p>
+                          <p className="text-lg font-mono text-white">₹{order.totalPrice?.toLocaleString()}</p>
                           <p className="text-[9px] text-white/30 mt-2">
                             {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </p>

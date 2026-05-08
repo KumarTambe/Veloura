@@ -96,7 +96,7 @@ export default function OrderConfirmation() {
                       <p className="text-sm font-serif text-white">{item.name}</p>
                       <p className="text-[8px] uppercase tracking-widest text-white/40">Qty: {item.quantity}</p>
                     </div>
-                    <p className="text-xs font-mono text-white/80">${item.price?.toLocaleString()}</p>
+                    <p className="text-xs font-mono text-white/80">₹{item.price?.toLocaleString()}</p>
                   </div>
                 ))}
               </div>
@@ -116,7 +116,7 @@ export default function OrderConfirmation() {
             <div className="border-t border-white/10 pt-6">
               <div className="flex justify-between items-center">
                 <span className="text-xs uppercase tracking-widest text-white">Total</span>
-                <span className="text-lg font-mono tracking-wider text-white">${order.totalPrice?.toLocaleString()}</span>
+                <span className="text-lg font-mono tracking-wider text-white">₹{order.totalPrice?.toLocaleString()}</span>
               </div>
             </div>
           </div>

@@ -18,7 +18,7 @@ export default function Collection() {
       try {
         const res = await fetch('/api/products');
         const data = await res.json();
-        setWatches(data);
+        setWatches(data.products || data);
       } catch (error) {
         console.error('Failed to fetch products', error);
       }
@@ -67,7 +67,7 @@ export default function Collection() {
                 </div>
                 <div className="flex flex-col items-end">
                   <p className="text-white/80 font-sans text-xs tracking-wider mb-2">
-                    ${watch.price?.toLocaleString()}
+                    ₹{watch.price?.toLocaleString()}
                   </p>
                   <button 
                     onClick={(e) => {
