@@ -77,7 +77,7 @@ export default function ProductDetails() {
           >
             <p className="text-[10px] uppercase tracking-[0.4em] text-white/40 mb-4">{product.brand} | {product.category}</p>
             <h1 className="text-4xl md:text-5xl font-serif text-white tracking-wide mb-6">{product.name}</h1>
-            <p className="text-2xl font-sans text-white/80 tracking-wider mb-10">${product.price?.toLocaleString()}</p>
+            <p className="text-2xl font-sans text-white/80 tracking-wider mb-10">₹{product.price?.toLocaleString()}</p>
             
             <div className="border-t border-white/10 pt-8 mb-12">
               <p className="text-sm text-white/60 leading-relaxed font-serif italic">

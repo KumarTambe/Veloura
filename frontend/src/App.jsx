@@ -11,12 +11,18 @@ import Checkout from './pages/Checkout';
 import ProductDetails from './pages/ProductDetails';
 import OrderConfirmation from './pages/OrderConfirmation';
 import MyOrders from './pages/MyOrders';
+import Profile from './pages/Profile';
+import Shop from './pages/Shop';
 
 // ScrollToTop component to ensure new routes start at the top
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (window.lenis) {
+      window.lenis.scrollTo(0, { immediate: true });
+    } else {
+      window.scrollTo(0, 0);
+    }
   }, [pathname]);
   return null;
 }
@@ -35,6 +41,8 @@ function App() {
       infinite: false,
     });
 
+    window.lenis = lenis;
+
     function raf(time) {
       lenis.raf(time);
       requestAnimationFrame(raf);
@@ -44,6 +52,7 @@ function App() {
 
     return () => {
       lenis.destroy();
+      delete window.lenis;
     };
   }, []);
 
@@ -61,6 +70,8 @@ function App() {
               <Route path="product/:id" element={<ProductDetails />} />
               <Route path="order/:id" element={<OrderConfirmation />} />
               <Route path="orders" element={<MyOrders />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="shop" element={<Shop />} />
             </Route>
           </Routes>
         </BrowserRouter>

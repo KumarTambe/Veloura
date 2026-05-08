@@ -32,6 +32,9 @@ export default function Navigation() {
         <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center">
           {/* Desktop Links (Left) */}
           <div className="hidden md:flex items-center space-x-12 w-1/3">
+            <Link to="/shop" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
+              Shop
+            </Link>
             {['Collections', 'Masterpieces'].map((item) => (
               <a
                 key={item}
@@ -54,10 +57,10 @@ export default function Navigation() {
           <div className="flex items-center justify-end space-x-8 w-1/3">
             {user ? (
               <div className="hidden md:flex items-center gap-4">
-                <div className="flex items-center gap-2 text-white/50">
+                <Link to="/profile" className="flex items-center gap-2 text-white/50 hover:text-white transition-colors">
                   <User size={16} strokeWidth={1.5} />
                   <span className="text-[10px] uppercase tracking-widest">{user.username}</span>
-                </div>
+                </Link>
                 <Link to="/orders" className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
                   Orders
                 </Link>
@@ -70,7 +73,10 @@ export default function Navigation() {
                 <User size={16} strokeWidth={1.5} />
               </Link>
             )}
-            <button className="text-white/50 hover:text-white transition-colors">
+            <button 
+              onClick={() => window.dispatchEvent(new CustomEvent('openSearch'))}
+              className="text-white/50 hover:text-white transition-colors"
+            >
               <Search size={16} strokeWidth={1.5} />
             </button>
             <button onClick={() => setIsCartOpen(true)} className="text-white/50 hover:text-white transition-colors relative">

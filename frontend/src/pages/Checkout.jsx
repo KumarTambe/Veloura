@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -10,6 +10,10 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+
+  // Saved address from profile
+  const [savedAddress, setSavedAddress] = useState(null);
+  const [useSavedAddress, setUseSavedAddress] = useState(false);
 
   // Form state
   const [shipping, setShipping] = useState({
@@ -28,6 +32,54 @@ export default function Checkout() {
     cvc: '',
   });
 
+  // Fetch saved address on mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user || !user.token) return;
+      try {
+        const res = await fetch('/api/users/profile', {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const data = await res.json();
+        if (res.ok && data.address && data.address.street) {
+          setSavedAddress({
+            ...data.address,
+            fullName: data.username || '',
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch profile:', error);
+      }
+    };
+    fetchProfile();
+  }, [user]);
+
+  // When user toggles to saved address, pre-fill the form
+  useEffect(() => {
+    if (useSavedAddress && savedAddress) {
+      const nameParts = (savedAddress.fullName || '').split(' ');
+      setShipping({
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
+        street: savedAddress.street || '',
+        city: savedAddress.city || '',
+        state: savedAddress.state || '',
+        zipCode: savedAddress.zipCode || '',
+        country: savedAddress.country || '',
+      });
+    } else if (!useSavedAddress) {
+      setShipping({
+        firstName: '',
+        lastName: '',
+        street: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        country: '',
+      });
+    }
+  }, [useSavedAddress, savedAddress]);
+
   const handleShippingChange = (e) => {
     setShipping({ ...shipping, [e.target.name]: e.target.value });
   };
@@ -39,7 +91,6 @@ export default function Checkout() {
   const handleNext = async (e) => {
     e.preventDefault();
     if (step === 3) {
-      // Submit order
       if (!user || !user.token) {
         alert('Please log in to place an order.');
         navigate('/login');
@@ -126,29 +177,99 @@ export default function Checkout() {
               {step === 1 && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
                   <h2 className="text-sm uppercase tracking-widest text-white/50 mb-6">Shipping Information</h2>
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="col-span-2 sm:col-span-1">
-                      <input type="text" name="firstName" placeholder="First Name" required value={shipping.firstName} onChange={handleShippingChange} className={inputClass} />
+
+                  {/* Address Selection Toggle */}
+                  {savedAddress && (
+                    <div className="space-y-4 mb-8">
+                      <div className="flex gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setUseSavedAddress(true)}
+                          className={`flex-1 p-4 border text-left transition-all duration-300 ${
+                            useSavedAddress
+                              ? 'border-luxury-gold/50 bg-luxury-gold/5'
+                              : 'border-white/10 hover:border-white/20'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
+                              useSavedAddress ? 'border-luxury-gold' : 'border-white/30'
+                            }`}>
+                              {useSavedAddress && <div className="w-2 h-2 rounded-full bg-luxury-gold"></div>}
+                            </div>
+                            <span className="text-[10px] uppercase tracking-[0.2em] text-white/70">Saved Address</span>
+                          </div>
+                          <p className="text-xs text-white/50 leading-relaxed pl-7">
+                            {savedAddress.street}<br />
+                            {savedAddress.city}, {savedAddress.state} {savedAddress.zipCode}<br />
+                            {savedAddress.country}
+                          </p>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setUseSavedAddress(false)}
+                          className={`flex-1 p-4 border text-left transition-all duration-300 ${
+                            !useSavedAddress
+                              ? 'border-luxury-gold/50 bg-luxury-gold/5'
+                              : 'border-white/10 hover:border-white/20'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
+                              !useSavedAddress ? 'border-luxury-gold' : 'border-white/30'
+                            }`}>
+                              {!useSavedAddress && <div className="w-2 h-2 rounded-full bg-luxury-gold"></div>}
+                            </div>
+                            <span className="text-[10px] uppercase tracking-[0.2em] text-white/70">New Address</span>
+                          </div>
+                          <p className="text-xs text-white/30 pl-7 mt-3">
+                            Enter a different shipping address
+                          </p>
+                        </button>
+                      </div>
                     </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <input type="text" name="lastName" placeholder="Last Name" required value={shipping.lastName} onChange={handleShippingChange} className={inputClass} />
+                  )}
+
+                  {/* Shipping Form — shown when no saved address, or when "New Address" is selected */}
+                  {(!savedAddress || !useSavedAddress) && (
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="col-span-2 sm:col-span-1">
+                        <input type="text" name="firstName" placeholder="First Name" required value={shipping.firstName} onChange={handleShippingChange} className={inputClass} />
+                      </div>
+                      <div className="col-span-2 sm:col-span-1">
+                        <input type="text" name="lastName" placeholder="Last Name" required value={shipping.lastName} onChange={handleShippingChange} className={inputClass} />
+                      </div>
+                      <div className="col-span-2">
+                        <input type="text" name="street" placeholder="Address" required value={shipping.street} onChange={handleShippingChange} className={inputClass} />
+                      </div>
+                      <div className="col-span-2 sm:col-span-1">
+                        <input type="text" name="city" placeholder="City" required value={shipping.city} onChange={handleShippingChange} className={inputClass} />
+                      </div>
+                      <div className="col-span-2 sm:col-span-1">
+                        <input type="text" name="state" placeholder="State" required value={shipping.state} onChange={handleShippingChange} className={inputClass} />
+                      </div>
+                      <div className="col-span-2 sm:col-span-1">
+                        <input type="text" name="zipCode" placeholder="Zip Code" required value={shipping.zipCode} onChange={handleShippingChange} className={inputClass} />
+                      </div>
+                      <div className="col-span-2 sm:col-span-1">
+                        <input type="text" name="country" placeholder="Country" required value={shipping.country} onChange={handleShippingChange} className={inputClass} />
+                      </div>
                     </div>
-                    <div className="col-span-2">
-                      <input type="text" name="street" placeholder="Address" required value={shipping.street} onChange={handleShippingChange} className={inputClass} />
+                  )}
+
+                  {/* Summary when using saved address */}
+                  {useSavedAddress && savedAddress && (
+                    <div className="p-6 border border-white/10 bg-white/[0.02]">
+                      <p className="text-[9px] uppercase tracking-[0.2em] text-white/40 mb-3">Delivering To</p>
+                      <p className="text-sm text-white/80 leading-relaxed">
+                        {savedAddress.fullName}<br />
+                        {savedAddress.street}<br />
+                        {savedAddress.city}, {savedAddress.state} {savedAddress.zipCode}<br />
+                        {savedAddress.country}
+                      </p>
                     </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <input type="text" name="city" placeholder="City" required value={shipping.city} onChange={handleShippingChange} className={inputClass} />
-                    </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <input type="text" name="state" placeholder="State" required value={shipping.state} onChange={handleShippingChange} className={inputClass} />
-                    </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <input type="text" name="zipCode" placeholder="Zip Code" required value={shipping.zipCode} onChange={handleShippingChange} className={inputClass} />
-                    </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <input type="text" name="country" placeholder="Country" required value={shipping.country} onChange={handleShippingChange} className={inputClass} />
-                    </div>
-                  </div>
+                  )}
                 </motion.div>
               )}
 
@@ -219,14 +340,14 @@ export default function Checkout() {
                     <p className="text-xs font-serif">{item.name}</p>
                     <p className="text-[8px] uppercase tracking-widest text-white/40">Qty: {item.quantity}</p>
                   </div>
-                  <p className="text-xs font-mono">${item.price?.toLocaleString()}</p>
+                  <p className="text-xs font-mono">₹{item.price?.toLocaleString()}</p>
                 </div>
               ))}
             </div>
             <div className="border-t border-white/10 pt-6">
               <div className="flex justify-between items-center">
                 <span className="text-xs uppercase tracking-widest">Total</span>
-                <span className="text-sm font-mono tracking-wider">${cartTotal.toLocaleString()}</span>
+                <span className="text-sm font-mono tracking-wider">₹{cartTotal.toLocaleString()}</span>
               </div>
             </div>
           </div>
