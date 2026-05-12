@@ -54,7 +54,7 @@ export default function SmartSearch() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  const suggestions = ['Royal Oak', 'Tourbillon', 'Rose Gold', 'Skeleton Dial', 'Chronograph'];
+  const suggestions = ['Deep Sea', 'Tourbillon', 'Rose Gold', 'Astronomica', 'Chronograph'];
 
   return (
     <>
