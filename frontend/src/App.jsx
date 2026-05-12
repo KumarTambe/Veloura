@@ -13,6 +13,11 @@ import OrderConfirmation from './pages/OrderConfirmation';
 import MyOrders from './pages/MyOrders';
 import Profile from './pages/Profile';
 import Shop from './pages/Shop';
+import Community from './pages/Community';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import ShippingInfo from './pages/ShippingInfo';
+import Returns from './pages/Returns';
 
 // Admin Pages
 import AdminRoute from './components/AdminRoute';
@@ -80,6 +85,13 @@ function App() {
               <Route path="orders" element={<MyOrders />} />
               <Route path="profile" element={<Profile />} />
               <Route path="shop" element={<Shop />} />
+              <Route path="community" element={<Community />} />
+
+              {/* Legal Routes */}
+              <Route path="privacy" element={<PrivacyPolicy />} />
+              <Route path="terms" element={<TermsOfService />} />
+              <Route path="shipping" element={<ShippingInfo />} />
+              <Route path="returns" element={<Returns />} />
 
               {/* Admin Routes */}
               <Route path="/admin" element={<AdminRoute />}>

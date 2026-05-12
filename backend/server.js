@@ -8,6 +8,8 @@ import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
+import announcementRoutes from './routes/announcementRoutes.js';
 
 // Fix for local DNS blocking SRV lookups (querySrv ECONNREFUSED)
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -27,6 +29,8 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/announcements', announcementRoutes);
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI)

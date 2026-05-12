@@ -40,6 +40,9 @@ export default function Navigation() {
                 <Link to="/admin/products" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
                   Products
                 </Link>
+                <Link to="/community" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
+                  Lounge
+                </Link>
                 <Link to="/admin/orders" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
                   Orders
                 </Link>
@@ -51,6 +54,9 @@ export default function Navigation() {
               <>
                 <Link to="/shop" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
                   Shop
+                </Link>
+                <Link to="/community" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
+                  Lounge
                 </Link>
                 {['Collections', 'Masterpieces'].map((item) => (
                   <a
