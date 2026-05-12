@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function CartDrawer() {
-  const { isCartOpen, setIsCartOpen, cartItems, removeFromCart, cartTotal } = useCart();
+  const { isCartOpen, setIsCartOpen, cartItems, removeFromCart, updateQuantity, cartTotal } = useCart();
   const navigate = useNavigate();
 
   return (
@@ -58,7 +58,22 @@ export default function CartDrawer() {
                         <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mt-1">
                           {item.category || item.brand}
                         </p>
-                        <p className="text-[10px] text-white/30 mt-1">Qty: {item.quantity}</p>
+                        <div className="flex items-center gap-3 mt-2">
+                          <button 
+                            onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                            className="w-5 h-5 rounded-full border border-white/30 flex items-center justify-center text-white/50 hover:text-white hover:border-white transition-colors"
+                          >
+                            -
+                          </button>
+                          <span className="text-[10px] text-white/80 w-3 text-center">{item.quantity}</span>
+                          <button 
+                            onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                            disabled={item.quantity >= item.stockQuantity}
+                            className={`w-5 h-5 rounded-full border border-white/30 flex items-center justify-center transition-colors ${item.quantity >= item.stockQuantity ? 'opacity-30 cursor-not-allowed' : 'text-white/50 hover:text-white hover:border-white'}`}
+                          >
+                            +
+                          </button>
+                        </div>
                       </div>
                       <div className="flex justify-between items-end">
                         <p className="text-xs font-mono text-white/80">

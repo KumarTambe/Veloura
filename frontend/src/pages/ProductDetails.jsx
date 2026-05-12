@@ -8,7 +8,7 @@ export default function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const { addToCart } = useCart();
+  const { cartItems, addToCart } = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -93,17 +93,23 @@ export default function ProductDetails() {
                 </span>
               </div>
 
-              <button 
-                onClick={() => addToCart(product)}
-                disabled={product.stockQuantity === 0}
-                className={`w-full py-5 text-[10px] uppercase tracking-[0.3em] font-semibold transition-all duration-300 ${
-                  product.stockQuantity > 0 
-                    ? 'bg-white text-black hover:bg-luxury-gold hover:text-white' 
-                    : 'bg-white/10 text-white/30 cursor-not-allowed'
-                }`}
-              >
-                Add to Cart
-              </button>
+              {(() => {
+                const cartItem = cartItems.find(item => item._id === product._id);
+                const maxReached = cartItem && cartItem.quantity >= product.stockQuantity;
+                return (
+                  <button 
+                    onClick={() => addToCart(product)}
+                    disabled={product.stockQuantity === 0 || maxReached}
+                    className={`w-full py-5 text-[10px] uppercase tracking-[0.3em] font-semibold transition-all duration-300 ${
+                      product.stockQuantity > 0 && !maxReached
+                        ? 'bg-white text-black hover:bg-luxury-gold hover:text-white' 
+                        : 'bg-white/10 text-white/30 cursor-not-allowed'
+                    }`}
+                  >
+                    {maxReached ? 'Max Stock in Cart' : 'Add to Cart'}
+                  </button>
+                );
+              })()}
             </div>
           </motion.div>
         </div>

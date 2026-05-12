@@ -14,6 +14,14 @@ import MyOrders from './pages/MyOrders';
 import Profile from './pages/Profile';
 import Shop from './pages/Shop';
 
+// Admin Pages
+import AdminRoute from './components/AdminRoute';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminProducts from './pages/admin/AdminProducts';
+import AdminProductEdit from './pages/admin/AdminProductEdit';
+import AdminOrders from './pages/admin/AdminOrders';
+import AdminUsers from './pages/admin/AdminUsers';
+
 // ScrollToTop component to ensure new routes start at the top
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -72,6 +80,15 @@ function App() {
               <Route path="orders" element={<MyOrders />} />
               <Route path="profile" element={<Profile />} />
               <Route path="shop" element={<Shop />} />
+
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminRoute />}>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="products" element={<AdminProducts />} />
+                <Route path="product/:id/edit" element={<AdminProductEdit />} />
+                <Route path="orders" element={<AdminOrders />} />
+                <Route path="users" element={<AdminUsers />} />
+              </Route>
             </Route>
           </Routes>
         </BrowserRouter>
