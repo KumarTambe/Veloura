@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import Order from '../models/Order.js';
 import User from '../models/User.js';
 import Product from '../models/Product.js';
+import sendOrderConfirmationEmail from '../utils/sendEmail.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -41,6 +42,9 @@ const createOrder = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   user.cart = [];
   await user.save();
+
+  // Send order confirmation email
+  sendOrderConfirmationEmail(createdOrder, req.user.email, req.user.username);
 
   res.status(201).json(createdOrder);
 });

@@ -32,23 +32,48 @@ export default function Navigation() {
         <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center">
           {/* Desktop Links (Left) */}
           <div className="hidden md:flex items-center space-x-12 w-1/3">
-            <Link to="/shop" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
-              Shop
-            </Link>
-            {['Collections', 'Masterpieces'].map((item) => (
-              <a
-                key={item}
-                href={`/#${item.toLowerCase()}`}
-                className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300"
-              >
-                {item}
-              </a>
-            ))}
+            {user && user.role === 'admin' ? (
+              <>
+                <Link to="/admin/dashboard" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
+                  Dashboard
+                </Link>
+                <Link to="/admin/products" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
+                  Products
+                </Link>
+                <Link to="/community" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
+                  Lounge
+                </Link>
+                <Link to="/admin/orders" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
+                  Orders
+                </Link>
+                <Link to="/admin/users" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
+                  Users
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/shop" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
+                  Shop
+                </Link>
+                <Link to="/community" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
+                  Lounge
+                </Link>
+                {['Collections', 'Masterpieces'].map((item) => (
+                  <a
+                    key={item}
+                    href={`/#${item.toLowerCase()}`}
+                    className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300"
+                  >
+                    {item}
+                  </a>
+                ))}
+              </>
+            )}
           </div>
 
           {/* Logo (Center) */}
           <div className="flex justify-center w-1/3">
-            <Link to="/" className="text-xl font-serif tracking-[0.3em] text-white">
+            <Link to={user && user.role === 'admin' ? '/admin/dashboard' : '/'} className="text-xl font-serif tracking-[0.3em] text-white">
               VELOURA
             </Link>
           </div>
@@ -57,41 +82,51 @@ export default function Navigation() {
           <div className="flex items-center justify-end space-x-8 w-1/3">
             {user ? (
               <div className="hidden md:flex items-center gap-4">
-                <Link to="/profile" className="flex items-center gap-2 text-white/50 hover:text-white transition-colors">
-                  <User size={16} strokeWidth={1.5} />
-                  <span className="text-[10px] uppercase tracking-widest">{user.username}</span>
-                </Link>
-                <Link to="/orders" className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
-                  Orders
-                </Link>
-                {user.role === 'admin' && (
-                  <Link to="/admin/dashboard" className="text-[10px] uppercase tracking-[0.2em] text-luxury-gold hover:text-white transition-colors">
-                    Admin
-                  </Link>
+                {user.role === 'admin' ? (
+                  <>
+                    <span className="text-[10px] uppercase tracking-widest text-luxury-gold">Admin</span>
+                    <button onClick={logout} className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/profile" className="flex items-center gap-2 text-white/50 hover:text-white transition-colors">
+                      <User size={16} strokeWidth={1.5} />
+                      <span className="text-[10px] uppercase tracking-widest">{user.username}</span>
+                    </Link>
+                    <Link to="/orders" className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
+                      Orders
+                    </Link>
+                    <button onClick={logout} className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
+                      Logout
+                    </button>
+                  </>
                 )}
-                <button onClick={logout} className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
-                  Logout
-                </button>
               </div>
             ) : (
               <Link to="/login" className="hidden md:flex items-center gap-2 text-white/50 hover:text-white transition-colors">
                 <User size={16} strokeWidth={1.5} />
               </Link>
             )}
-            <button 
-              onClick={() => window.dispatchEvent(new CustomEvent('openSearch'))}
-              className="text-white/50 hover:text-white transition-colors"
-            >
-              <Search size={16} strokeWidth={1.5} />
-            </button>
-            <button onClick={() => setIsCartOpen(true)} className="text-white/50 hover:text-white transition-colors relative">
-              <ShoppingBag size={16} strokeWidth={1.5} />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-2 text-[8px] text-luxury-gold tracking-tighter">
-                  {cartCount}
-                </span>
-              )}
-            </button>
+            {(!user || user.role !== 'admin') && (
+              <>
+                <button 
+                  onClick={() => window.dispatchEvent(new CustomEvent('openSearch'))}
+                  className="text-white/50 hover:text-white transition-colors"
+                >
+                  <Search size={16} strokeWidth={1.5} />
+                </button>
+                <button onClick={() => setIsCartOpen(true)} className="text-white/50 hover:text-white transition-colors relative">
+                  <ShoppingBag size={16} strokeWidth={1.5} />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-2 text-[8px] text-luxury-gold tracking-tighter">
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
+              </>
+            )}
             <button
               className="md:hidden text-white/50 hover:text-white"
               onClick={() => setIsMobileMenuOpen(true)}

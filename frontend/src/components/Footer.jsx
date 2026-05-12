@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function Footer() {
   return (
     <footer className="bg-luxury-black pt-32 pb-12 border-t border-white/5">
@@ -14,26 +16,36 @@ export default function Footer() {
           <div>
             <h3 className="text-[10px] uppercase tracking-[0.3em] text-white/30 mb-6 font-semibold">Boutique</h3>
             <ul className="space-y-4">
-              {['Collections', 'Masterpieces', 'Heritage', 'Services'].map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-xs text-white/60 hover:text-white transition-colors tracking-widest">
-                    {link}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <Link to="/shop" className="text-xs text-white/60 hover:text-white transition-colors tracking-widest">Collections</Link>
+              </li>
+              <li>
+                <Link to="/shop" className="text-xs text-white/60 hover:text-white transition-colors tracking-widest">Masterpieces</Link>
+              </li>
+              <li>
+                <Link to="/community" className="text-xs text-white/60 hover:text-white transition-colors tracking-widest">Heritage</Link>
+              </li>
+              <li>
+                <Link to="/shipping" className="text-xs text-white/60 hover:text-white transition-colors tracking-widest">Services</Link>
+              </li>
             </ul>
           </div>
 
           <div>
             <h3 className="text-[10px] uppercase tracking-[0.3em] text-white/30 mb-6 font-semibold">Legal</h3>
             <ul className="space-y-4">
-              {['Privacy Policy', 'Terms of Service', 'Shipping Info', 'Returns'].map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-xs text-white/60 hover:text-white transition-colors tracking-widest">
-                    {link}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <Link to="/privacy" className="text-xs text-white/60 hover:text-white transition-colors tracking-widest">Privacy Policy</Link>
+              </li>
+              <li>
+                <Link to="/terms" className="text-xs text-white/60 hover:text-white transition-colors tracking-widest">Terms of Service</Link>
+              </li>
+              <li>
+                <Link to="/shipping" className="text-xs text-white/60 hover:text-white transition-colors tracking-widest">Shipping Info</Link>
+              </li>
+              <li>
+                <Link to="/returns" className="text-xs text-white/60 hover:text-white transition-colors tracking-widest">Returns</Link>
+              </li>
             </ul>
           </div>
           

@@ -3,19 +3,23 @@ import Navigation from '../components/Navigation';
 import SmartSearch from '../components/SmartSearch';
 import CartDrawer from '../components/CartDrawer';
 import Footer from '../components/Footer';
+import { useAuth } from '../context/AuthContext';
 
 export default function MainLayout() {
+  const { user } = useAuth();
+  const isAdmin = user && user.role === 'admin';
+
   return (
     <>
       <Navigation />
-      <SmartSearch />
-      <CartDrawer />
+      {!isAdmin && <SmartSearch />}
+      {!isAdmin && <CartDrawer />}
       
       <main className="min-h-screen">
         <Outlet />
       </main>
 
-      <Footer />
+      {!isAdmin && <Footer />}
     </>
   );
 }

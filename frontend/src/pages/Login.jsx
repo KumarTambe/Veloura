@@ -13,7 +13,13 @@ export default function Login() {
     e.preventDefault();
     const success = await login(email, password);
     if (success) {
-      navigate('/');
+      // Check if the logged-in user is admin
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      if (userInfo && userInfo.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
     }
   };
 
