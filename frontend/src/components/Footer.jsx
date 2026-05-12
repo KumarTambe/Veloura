@@ -1,11 +1,10 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
     <footer className="bg-luxury-black pt-32 pb-12 border-t border-white/5">
       <div className="container mx-auto px-6 lg:px-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
-          
           <div className="col-span-1 md:col-span-2">
             <h2 className="text-2xl font-serif tracking-[0.3em] text-white mb-6">VELOURA.</h2>
             <p className="text-xs text-white/40 max-w-sm tracking-widest leading-relaxed">
@@ -48,7 +47,6 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-          
         </div>
 
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
