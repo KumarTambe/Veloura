@@ -64,6 +64,11 @@ export default function Navigation() {
                 <Link to="/orders" className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
                   Orders
                 </Link>
+                {user.role === 'admin' && (
+                  <Link to="/admin/dashboard" className="text-[10px] uppercase tracking-[0.2em] text-luxury-gold hover:text-white transition-colors">
+                    Admin
+                  </Link>
+                )}
                 <button onClick={logout} className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
                   Logout
                 </button>

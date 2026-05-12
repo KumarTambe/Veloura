@@ -15,6 +15,7 @@ const transformServerCart = (serverCart) => {
       description: item.product.description,
       category: item.product.category,
       brand: item.product.brand,
+      stockQuantity: item.product.stockQuantity,
       quantity: item.quantity,
     }));
 };
@@ -91,9 +92,10 @@ export function CartProvider({ children }) {
           body: JSON.stringify({ productId: item._id, quantity: 1 }),
         });
         const data = await res.json();
-        if (Array.isArray(data)) {
+        if (res.ok && Array.isArray(data)) {
           setCartItems(transformServerCart(data));
         } else {
+          alert(data.message || 'Cart API error');
           console.error('Cart API error:', data);
         }
       } catch (error) {
@@ -104,9 +106,17 @@ export function CartProvider({ children }) {
       setCartItems((prev) => {
         const existing = prev.find((i) => i._id === item._id);
         if (existing) {
+          if (existing.quantity >= item.stockQuantity) {
+            alert('Cannot add more than available stock');
+            return prev;
+          }
           return prev.map((i) =>
             i._id === item._id ? { ...i, quantity: i.quantity + 1 } : i
           );
+        }
+        if (1 > item.stockQuantity) {
+          alert('Out of stock');
+          return prev;
         }
         return [...prev, { ...item, quantity: 1 }];
       });
@@ -131,6 +141,46 @@ export function CartProvider({ children }) {
       }
     } else {
       setCartItems((prev) => prev.filter((item) => item._id !== productId));
+    }
+  };
+
+  const updateQuantity = async (productId, newQuantity) => {
+    const item = cartItems.find((i) => i._id === productId);
+    if (item && newQuantity > item.stockQuantity) {
+      alert('Cannot add more than available stock');
+      return;
+    }
+
+    if (newQuantity <= 0) {
+      return removeFromCart(productId);
+    }
+
+    const token = getToken();
+    if (token) {
+      try {
+        const res = await fetch(`/api/cart/${productId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ quantity: newQuantity }),
+        });
+        const data = await res.json();
+        if (res.ok && Array.isArray(data)) {
+          setCartItems(transformServerCart(data));
+        } else {
+          alert(data.message || 'Failed to update quantity');
+        }
+      } catch (error) {
+        console.error('Failed to update cart quantity:', error);
+      }
+    } else {
+      setCartItems((prev) =>
+        prev.map((i) =>
+          i._id === productId ? { ...i, quantity: newQuantity } : i
+        )
+      );
     }
   };
 
@@ -166,6 +216,7 @@ export function CartProvider({ children }) {
         addToCart,
         removeFromCart,
         clearCart,
+        updateQuantity,
         cartTotal,
         cartCount,
       }}

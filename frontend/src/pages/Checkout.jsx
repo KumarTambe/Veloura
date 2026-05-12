@@ -15,7 +15,6 @@ export default function Checkout() {
   const [savedAddress, setSavedAddress] = useState(null);
   const [useSavedAddress, setUseSavedAddress] = useState(false);
 
-  // Form state
   const [shipping, setShipping] = useState({
     firstName: '',
     lastName: '',
@@ -24,12 +23,6 @@ export default function Checkout() {
     state: '',
     zipCode: '',
     country: '',
-  });
-
-  const [payment, setPayment] = useState({
-    cardNumber: '',
-    expiry: '',
-    cvc: '',
   });
 
   // Fetch saved address on mount
@@ -84,13 +77,9 @@ export default function Checkout() {
     setShipping({ ...shipping, [e.target.name]: e.target.value });
   };
 
-  const handlePaymentChange = (e) => {
-    setPayment({ ...payment, [e.target.name]: e.target.value });
-  };
-
   const handleNext = async (e) => {
     e.preventDefault();
-    if (step === 3) {
+    if (step === 2) {
       if (!user || !user.token) {
         alert('Please log in to place an order.');
         navigate('/login');
@@ -99,45 +88,126 @@ export default function Checkout() {
 
       setLoading(true);
       try {
-        const orderData = {
-          orderItems: cartItems.map((item) => ({
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price,
-            product: item._id,
-          })),
-          shippingAddress: {
-            street: shipping.street,
-            city: shipping.city,
-            state: shipping.state,
-            zipCode: shipping.zipCode,
-            country: shipping.country,
-          },
-          paymentMethod: 'Credit Card',
-          totalPrice: cartTotal,
-        };
+        // 1. Get Razorpay key
+        const keyRes = await fetch('/api/payment/key', {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const { keyId } = await keyRes.json();
 
-        const res = await fetch('/api/orders', {
+        if (!keyId) {
+           alert('Payment gateway configuration missing. Please ensure RAZORPAY_KEY_ID is set in the backend .env file.');
+           setLoading(false);
+           return;
+        }
+
+        // 2. Create Order on our backend
+        const createRes = await fetch('/api/payment/create-order', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${user.token}`,
           },
-          body: JSON.stringify(orderData),
+          body: JSON.stringify({ amount: cartTotal }),
         });
+        
+        const orderData = await createRes.json();
+        if (!createRes.ok) throw new Error(orderData.message || 'Could not create order');
 
-        const data = await res.json();
+        // 3. Open Razorpay Checkout Modal
+        const options = {
+          key: keyId,
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: 'Veloura Premium',
+          description: 'Luxury Watch Purchase',
+          order_id: orderData.id,
+          handler: async function (response) {
+            try {
+              setLoading(true);
+              // 4. Verify payment on our backend
+              const verifyRes = await fetch('/api/payment/verify', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${user.token}`,
+                },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                }),
+              });
 
-        if (res.ok) {
-          await clearCart();
-          navigate(`/order/${data._id}`);
-        } else {
-          alert(data.message || 'Failed to place order');
-        }
+              const verifyData = await verifyRes.json();
+              if (!verifyRes.ok) throw new Error(verifyData.message || 'Payment verification failed');
+
+              // 5. Create final order in DB
+              const finalOrderData = {
+                orderItems: cartItems.map((item) => ({
+                  name: item.name,
+                  quantity: item.quantity,
+                  price: item.price,
+                  product: item._id,
+                })),
+                shippingAddress: {
+                  street: shipping.street,
+                  city: shipping.city,
+                  state: shipping.state,
+                  zipCode: shipping.zipCode,
+                  country: shipping.country,
+                },
+                paymentMethod: 'Razorpay',
+                totalPrice: cartTotal,
+                paymentResult: {
+                  id: response.razorpay_payment_id,
+                  orderId: response.razorpay_order_id,
+                  signature: response.razorpay_signature,
+                }
+              };
+
+              const res = await fetch('/api/orders', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${user.token}`,
+                },
+                body: JSON.stringify(finalOrderData),
+              });
+
+              const dbOrderData = await res.json();
+
+              if (res.ok) {
+                await clearCart();
+                navigate(`/order/${dbOrderData._id}`);
+              } else {
+                alert(dbOrderData.message || 'Failed to record order');
+              }
+            } catch (error) {
+              console.error('Verification error:', error);
+              alert(error.message || 'An error occurred during verification.');
+            } finally {
+              setLoading(false);
+            }
+          },
+          prefill: {
+            name: `${shipping.firstName} ${shipping.lastName}`,
+            email: user.email,
+            contact: '9999999999',
+          },
+          theme: {
+            color: '#C5A059', // Veloura Gold
+          },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+          alert(`Payment failed: ${response.error.description}`);
+          setLoading(false);
+        });
+        rzp.open();
       } catch (error) {
         console.error('Order error:', error);
-        alert('An error occurred while placing your order.');
-      } finally {
+        alert(error.message || 'An error occurred while initiating payment.');
         setLoading(false);
       }
     } else {
@@ -165,9 +235,7 @@ export default function Checkout() {
           <div className="flex space-x-4 text-[10px] uppercase tracking-[0.2em] font-mono">
             <span className={step === 1 ? 'text-white' : 'text-white/30'}>1. Shipping</span>
             <span className="text-white/30">/</span>
-            <span className={step === 2 ? 'text-white' : 'text-white/30'}>2. Payment</span>
-            <span className="text-white/30">/</span>
-            <span className={step === 3 ? 'text-white' : 'text-white/30'}>3. Confirm</span>
+            <span className={step === 2 ? 'text-white' : 'text-white/30'}>2. Confirm & Pay</span>
           </div>
         </div>
 
@@ -275,24 +343,7 @@ export default function Checkout() {
 
               {step === 2 && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-                  <h2 className="text-sm uppercase tracking-widest text-white/50 mb-6">Payment Details</h2>
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="col-span-2">
-                      <input type="text" name="cardNumber" placeholder="Card Number" required value={payment.cardNumber} onChange={handlePaymentChange} className={`${inputClass} font-mono tracking-widest`} />
-                    </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <input type="text" name="expiry" placeholder="MM/YY" required value={payment.expiry} onChange={handlePaymentChange} className={`${inputClass} font-mono`} />
-                    </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <input type="text" name="cvc" placeholder="CVC" required value={payment.cvc} onChange={handlePaymentChange} className={`${inputClass} font-mono`} />
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {step === 3 && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-                  <h2 className="text-sm uppercase tracking-widest text-white/50 mb-6">Confirm Order</h2>
+                  <h2 className="text-sm uppercase tracking-widest text-white/50 mb-6">Confirm & Pay</h2>
                   
                   <div className="space-y-4 border-b border-white/10 pb-6">
                     <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">Shipping To</p>
@@ -305,8 +356,16 @@ export default function Checkout() {
                   </div>
 
                   <p className="text-xs text-white/60 leading-relaxed">
-                    By confirming this order, you agree to Veloura's Terms of Service. Your item will be shipped securely via armored courier within 2-3 business days.
+                    By proceeding, you will be securely redirected to Razorpay to complete your payment. 
+                    Your item will be shipped securely via armored courier within 2-3 business days upon payment confirmation.
                   </p>
+                  
+                  <div className="p-4 bg-luxury-gold/5 border border-luxury-gold/20 rounded">
+                    <p className="text-[10px] uppercase tracking-widest text-luxury-gold mb-1">Test Mode Notice</p>
+                    <p className="text-[10px] text-white/50 leading-relaxed">
+                      Razorpay limits test transactions significantly. If your cart exceeds this, the payment popup will show ₹100 to allow the test to succeed, but your actual order will be recorded correctly. Please use an <strong>Indian</strong> test card or Netbanking.
+                    </p>
+                  </div>
                 </motion.div>
               )}
 
@@ -325,7 +384,7 @@ export default function Checkout() {
                       : 'bg-white text-black hover:bg-luxury-gold hover:text-white'
                   }`}
                 >
-                  {loading ? 'Processing...' : step === 3 ? 'Complete Purchase' : 'Continue'}
+                  {loading ? 'Processing...' : step === 2 ? 'Pay with Razorpay' : 'Continue'}
                 </button>
               </div>
             </form>

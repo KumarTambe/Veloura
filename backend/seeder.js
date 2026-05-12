@@ -20,6 +20,18 @@ const importData = async () => {
     // Don't delete users so we don't lose the one just created, or we can just delete it if we want.
     // We will leave users intact to preserve the user's new account.
 
+    // Check if admin user exists, if not create one
+    const adminExists = await User.findOne({ email: 'admin@veloura.com' });
+    if (!adminExists) {
+      await User.create({
+        username: 'Admin',
+        email: 'admin@veloura.com',
+        password: 'password123',
+        role: 'admin',
+      });
+      console.log('Admin user created (admin@veloura.com / password123)');
+    }
+
     // Insert sample products
     await Product.insertMany(products);
 

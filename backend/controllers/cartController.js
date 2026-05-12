@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/User.js';
+import Product from '../models/Product.js';
 
 // @desc    Get user cart
 // @route   GET /api/cart
@@ -27,13 +28,26 @@ const addToCart = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
 
+  const product = await Product.findById(productId);
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+
   // Check if item already in cart
   const existingItem = user.cart.find(
     (item) => item.product.toString() === productId
   );
 
+  const newQuantity = existingItem ? existingItem.quantity + quantity : quantity;
+
+  if (newQuantity > product.stockQuantity) {
+    res.status(400);
+    throw new Error('Cannot add more than available stock');
+  }
+
   if (existingItem) {
-    existingItem.quantity += quantity;
+    existingItem.quantity = newQuantity;
   } else {
     user.cart.push({ product: productId, quantity });
   }
@@ -82,4 +96,45 @@ const clearCart = asyncHandler(async (req, res) => {
   res.json([]);
 });
 
-export { getCart, addToCart, removeFromCart, clearCart };
+// @desc    Update item quantity in cart
+// @route   PUT /api/cart/:productId
+// @access  Private
+const updateCartQuantity = asyncHandler(async (req, res) => {
+  const { quantity } = req.body;
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  const product = await Product.findById(req.params.productId);
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+
+  if (quantity > product.stockQuantity) {
+    res.status(400);
+    throw new Error('Cannot add more than available stock');
+  }
+
+  const existingItem = user.cart.find(
+    (item) => item.product.toString() === req.params.productId
+  );
+
+  if (existingItem) {
+    existingItem.quantity = quantity;
+    if (existingItem.quantity <= 0) {
+      user.cart = user.cart.filter(
+        (item) => item.product.toString() !== req.params.productId
+      );
+    }
+  }
+
+  await user.save();
+  const updatedUser = await User.findById(req.user._id).populate('cart.product');
+  res.json(updatedUser.cart);
+});
+
+export { getCart, addToCart, removeFromCart, clearCart, updateCartQuantity };
