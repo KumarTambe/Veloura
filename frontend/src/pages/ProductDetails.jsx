@@ -1,10 +1,61 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import ReviewCard from '../components/ReviewCard';
 import { Star } from 'lucide-react';
+
+const hotspotPresets = {
+  diver: [
+    { label: 'Ceramic bezel', className: 'left-[28%] top-[28%]' },
+    { label: 'Deep-seal crown', className: 'right-[20%] top-[47%]' },
+    { label: 'Luminous markers', className: 'left-[46%] bottom-[34%]' },
+  ],
+  chronograph: [
+    { label: 'Twin registers', className: 'left-[34%] top-[39%]' },
+    { label: 'Tachymeter scale', className: 'right-[24%] top-[27%]' },
+    { label: 'Push-piece action', className: 'right-[18%] top-[52%]' },
+  ],
+  tourbillon: [
+    { label: 'Flying tourbillon', className: 'left-[47%] bottom-[29%]' },
+    { label: 'Skeleton bridges', className: 'left-[36%] top-[43%]' },
+    { label: 'Black ceramic case', className: 'right-[23%] top-[38%]' },
+  ],
+  dress: [
+    { label: 'Enamel dial', className: 'left-[42%] top-[38%]' },
+    { label: 'Roman numerals', className: 'right-[27%] top-[31%]' },
+    { label: 'Ultra-thin profile', className: 'left-[28%] bottom-[31%]' },
+  ],
+  pilot: [
+    { label: 'Luminous handset', className: 'left-[45%] top-[42%]' },
+    { label: 'Dual timezone', className: 'right-[27%] top-[37%]' },
+    { label: 'Titanium case', className: 'left-[25%] bottom-[35%]' },
+  ],
+  perpetual: [
+    { label: 'Calendar aperture', className: 'left-[44%] top-[38%]' },
+    { label: 'Moonphase display', className: 'left-[46%] bottom-[35%]' },
+    { label: 'Gold casework', className: 'right-[24%] top-[48%]' },
+  ],
+  default: [
+    { label: 'Polished bezel', className: 'left-[31%] top-[30%]' },
+    { label: 'Signature dial', className: 'left-[45%] top-[45%]' },
+    { label: 'Crown detail', className: 'right-[20%] top-[50%]' },
+  ],
+};
+
+function getProductHotspots(product) {
+  const source = `${product?.name || ''} ${product?.category || ''} ${product?.description || ''}`.toLowerCase();
+
+  if (source.includes('diver') || source.includes('sea') || source.includes('aqua')) return hotspotPresets.diver;
+  if (source.includes('chrono') || source.includes('racing')) return hotspotPresets.chronograph;
+  if (source.includes('tourbillon') || source.includes('skeleton')) return hotspotPresets.tourbillon;
+  if (source.includes('dress') || source.includes('thin') || source.includes('classique')) return hotspotPresets.dress;
+  if (source.includes('pilot') || source.includes('aviator')) return hotspotPresets.pilot;
+  if (source.includes('perpetual') || source.includes('lunar') || source.includes('moon')) return hotspotPresets.perpetual;
+
+  return hotspotPresets.default;
+}
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -127,11 +178,13 @@ export default function ProductDetails() {
     );
   }
 
+  const productHotspots = getProductHotspots(product);
+
   return (
     <div className="min-h-screen pt-32 pb-20 bg-luxury-black">
       <div className="container mx-auto px-6 lg:px-12">
         <Link to="/" className="inline-block text-[9px] uppercase tracking-[0.3em] text-white/50 hover:text-white transition-colors mb-12">
-          ← Back to Collection
+          &larr; Back to Collection
         </Link>
         
         <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
@@ -140,13 +193,36 @@ export default function ProductDetails() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="w-full lg:w-1/2 aspect-[4/5] bg-luxury-charcoal relative overflow-hidden"
+            className="group w-full lg:w-1/2 aspect-[4/5] bg-luxury-charcoal relative overflow-hidden border border-white/10 shadow-[0_40px_120px_rgba(0,0,0,0.55)]"
           >
+            <div className="absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_42%,rgba(179,144,80,0.16),transparent_30%),linear-gradient(180deg,rgba(3,3,3,0.05)_0%,rgba(3,3,3,0.42)_100%)]" />
+            <div className="absolute inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-luxury-gold/50 to-transparent" />
+            <div className="absolute inset-0 z-20 bg-[linear-gradient(115deg,transparent_24%,rgba(255,255,255,0.14)_46%,transparent_62%)] opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
             <img 
               src={product.images && product.images.length > 0 ? product.images[0] : ''} 
               alt={product.name}
-              className="absolute inset-0 w-full h-full object-cover opacity-80"
+              className="absolute inset-0 w-full h-full object-cover opacity-82"
             />
+            {productHotspots.map((spot, index) => (
+              <motion.div
+                key={spot.label}
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.45 + index * 0.14 }}
+                className={`absolute z-30 ${spot.className}`}
+              >
+                <div className="group/hotspot relative">
+                  <span className="block h-3 w-3 rounded-full bg-luxury-gold shadow-[0_0_22px_rgba(179,144,80,0.9)]" />
+                  <span className="absolute inset-0 h-3 w-3 animate-ping rounded-full bg-luxury-gold/50" />
+                  <span className="pointer-events-none absolute left-5 top-1/2 min-w-32 -translate-y-1/2 border border-white/10 bg-black/75 px-3 py-2 text-[9px] uppercase tracking-[0.2em] text-white/72 opacity-0 backdrop-blur-md transition-opacity duration-300 group-hover/hotspot:opacity-100 sm:min-w-40 sm:text-[10px]">
+                    {spot.label}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+            <div className="absolute bottom-5 left-5 z-30 border border-white/10 bg-black/45 px-4 py-3 backdrop-blur-md">
+              <p className="text-[9px] uppercase tracking-[0.28em] text-luxury-gold">Interactive details</p>
+            </div>
           </motion.div>
 
           {/* Details Section */}

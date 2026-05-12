@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -106,10 +106,10 @@ export default function Shop() {
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0 center' }}
             >
               <option value="newest" className="bg-black">Newest</option>
-              <option value="price_asc" className="bg-black">Price: Low → High</option>
-              <option value="price_desc" className="bg-black">Price: High → Low</option>
-              <option value="name_asc" className="bg-black">Name: A → Z</option>
-              <option value="name_desc" className="bg-black">Name: Z → A</option>
+              <option value="price_asc" className="bg-black">Price: Low to High</option>
+              <option value="price_desc" className="bg-black">Price: High to Low</option>
+              <option value="name_asc" className="bg-black">Name: A to Z</option>
+              <option value="name_desc" className="bg-black">Name: Z to A</option>
             </select>
 
             <button

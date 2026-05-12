@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
@@ -122,7 +122,7 @@ export default function MyOrders() {
 
                       {/* Hover hint */}
                       <div className="mt-4 pt-4 border-t border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <p className="text-[9px] uppercase tracking-[0.2em] text-white/30 text-right">View Details →</p>
+                        <p className="text-[9px] uppercase tracking-[0.2em] text-white/30 text-right">View Details &rarr;</p>
                       </div>
                     </div>
                   </Link>

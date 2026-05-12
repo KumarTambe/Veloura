@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
@@ -61,7 +61,7 @@ export default function OrderConfirmation() {
           {/* Success Header */}
           <div className="text-center mb-16">
             <div className="w-16 h-16 rounded-full border border-luxury-gold/50 flex items-center justify-center mx-auto mb-8">
-              <span className="text-luxury-gold text-2xl">✓</span>
+              <span className="text-luxury-gold text-2xl">&#10003;</span>
             </div>
             <h1 className="text-2xl font-serif tracking-[0.3em] text-white mb-4">ORDER CONFIRMED</h1>
             <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">
