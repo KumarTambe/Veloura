@@ -94,7 +94,7 @@ const products = [
   },
   {
     name: 'Monaco Racing',
-    description: 'An iconic square-cased chronograph inspired by motorsport heritage. Automatic caliber with 60-hour power reserve.',
+    description: 'A sporty automatic with a deep black dial, date window, and supple leather strap. Inspired by motorsport heritage, with a 60-hour power reserve.',
     price: 72000,
     images: ['https://images.unsplash.com/photo-1612817159949-195b6eb9e31a?q=80&w=800&auto=format&fit=crop'],
     category: 'Sports',
@@ -121,7 +121,7 @@ const products = [
   },
   {
     name: 'Aqua Explorer',
-    description: 'Professional dive watch with helium escape valve, 600m water resistance, and a unidirectional rotating bezel in black ceramic.',
+    description: 'Steel chronograph with a blue dial, tachymeter bezel, and three sub-dials on a tan leather strap. Built for adventure, water-resistant to 100m.',
     price: 48000,
     images: ['https://images.unsplash.com/photo-1509941943102-10c232535736?q=80&w=800&auto=format&fit=crop'],
     category: 'Sports',

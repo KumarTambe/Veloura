@@ -41,7 +41,7 @@ export default function AdminUsers() {
 
         <div className="overflow-x-auto border border-white/10">
           <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-white/5 border-b border-white/10 uppercase tracking-widest text-[10px] text-white/50">
+            <thead className="bg-white/5 border-b border-white/10 uppercase tracking-widest text-xs text-white/50">
               <tr>
                 <th className="p-4">ID</th>
                 <th className="p-4">Name</th>
@@ -57,7 +57,7 @@ export default function AdminUsers() {
                   <td className="p-4 font-serif">{u.username}</td>
                   <td className="p-4 text-white/70">{u.email}</td>
                   <td className="p-4">
-                    <span className={`px-2 py-1 text-[10px] uppercase tracking-wider ${u.role === 'admin' ? 'bg-luxury-gold/10 text-luxury-gold' : 'bg-white/5 text-white/50'}`}>
+                    <span className={`px-2 py-1 text-xs uppercase tracking-wider ${u.role === 'admin' ? 'bg-luxury-gold/10 text-luxury-gold' : 'bg-white/5 text-white/50'}`}>
                       {u.role}
                     </span>
                   </td>

@@ -40,13 +40,13 @@ export default function CartDrawer() {
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {cartItems.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center opacity-50">
-                  <p className="text-xs uppercase tracking-[0.2em] font-sans">Your collection is empty.</p>
+                  <p className="text-[13px] uppercase tracking-[0.2em] font-sans">Your collection is empty.</p>
                 </div>
               ) : (
                 cartItems.map((item) => (
                   <div key={item._id} className="flex gap-4 pb-6 border-b border-white/5">
                     <div className="w-20 h-24 bg-luxury-black overflow-hidden flex-shrink-0">
-                      <img 
+                      <img loading="lazy" decoding="async" 
                         src={item.images && item.images.length > 0 ? item.images[0] : ''} 
                         alt={item.name} 
                         className="w-full h-full object-cover opacity-80" 
@@ -55,7 +55,7 @@ export default function CartDrawer() {
                     <div className="flex flex-col justify-between flex-1">
                       <div>
                         <h3 className="text-sm font-serif text-white tracking-wider">{item.name}</h3>
-                        <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mt-1">
+                        <p className="text-xs text-white/50 uppercase tracking-[0.2em] mt-1">
                           {item.category || item.brand}
                         </p>
                         <div className="flex items-center gap-3 mt-2">
@@ -65,7 +65,7 @@ export default function CartDrawer() {
                           >
                             -
                           </button>
-                          <span className="text-[10px] text-white/80 w-3 text-center">{item.quantity}</span>
+                          <span className="text-xs text-white/80 w-3 text-center">{item.quantity}</span>
                           <button 
                             onClick={() => updateQuantity(item._id, item.quantity + 1)}
                             disabled={item.quantity >= item.stockQuantity}
@@ -76,12 +76,12 @@ export default function CartDrawer() {
                         </div>
                       </div>
                       <div className="flex justify-between items-end">
-                        <p className="text-xs font-mono text-white/80">
+                        <p className="text-[13px] font-mono text-white/80">
                           ₹{item.price?.toLocaleString()}
                         </p>
                         <button 
                           onClick={() => removeFromCart(item._id)}
-                          className="text-[9px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors border-b border-transparent hover:border-white/30"
+                          className="text-[11px] uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors border-b border-transparent hover:border-white/30"
                         >
                           Remove
                         </button>
@@ -96,7 +96,7 @@ export default function CartDrawer() {
             {cartItems.length > 0 && (
               <div className="p-6 bg-luxury-black border-t border-white/10">
                 <div className="flex justify-between mb-6">
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-white/50">Subtotal</span>
+                  <span className="text-xs uppercase tracking-[0.2em] text-white/50">Subtotal</span>
                   <span className="text-sm font-mono tracking-wider">₹{cartTotal.toLocaleString()}</span>
                 </div>
                 <button 
@@ -104,7 +104,7 @@ export default function CartDrawer() {
                     setIsCartOpen(false);
                     navigate('/checkout');
                   }}
-                  className="w-full py-4 bg-white text-black text-[10px] uppercase tracking-[0.3em] font-semibold hover:bg-luxury-gold hover:text-white transition-all duration-300"
+                  className="w-full py-4 bg-white text-black text-xs uppercase tracking-[0.3em] font-semibold hover:bg-luxury-gold hover:text-white transition-all duration-300"
                 >
                   Proceed to Checkout
                 </button>

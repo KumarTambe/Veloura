@@ -3,12 +3,15 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import dns from 'dns';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import userRoutes from './routes/userRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
+import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 // Fix for local DNS blocking SRV lookups (querySrv ECONNREFUSED)
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -19,8 +22,20 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+app.use(helmet());
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
+
+// Slow down brute-force attempts on login/register
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { message: 'Too many attempts, please try again in 15 minutes' },
+});
+app.use('/api/users/login', authLimiter);
+app.post('/api/users', authLimiter);
 
 // Routes
 app.use('/api/users', userRoutes);
@@ -39,6 +54,10 @@ mongoose.connect(process.env.MONGODB_URI)
 app.get('/', (req, res) => {
   res.send('Veloura API is running...');
 });
+
+// Must come after all routes
+app.use(notFound);
+app.use(errorHandler);
 
 // Start Server
 app.listen(PORT, () => {

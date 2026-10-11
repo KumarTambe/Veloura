@@ -1,17 +1,17 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { API_URL } from '../config/api';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const userInfo = localStorage.getItem('userInfo');
-    if (userInfo) {
-      setUser(JSON.parse(userInfo));
+  // Read the saved session synchronously so the first render already knows the user
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('userInfo')) || null;
+    } catch {
+      return null;
     }
-  }, []);
+  });
 
   const login = async (email, password) => {
     try {
@@ -79,4 +79,5 @@ export function AuthProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

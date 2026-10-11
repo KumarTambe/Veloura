@@ -28,12 +28,12 @@ export default function Register() {
       >
         <div className="text-center mb-12">
           <h1 className="text-2xl font-serif text-white tracking-[0.3em] mb-4">REGISTER</h1>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">Join the exclusive circle</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-white/50">Join the exclusive circle</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
           <div>
-            <label className="block text-[9px] uppercase tracking-[0.3em] text-white/50 mb-3">Full Name</label>
+            <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">Full Name</label>
             <input 
               type="text" 
               required
@@ -43,7 +43,7 @@ export default function Register() {
             />
           </div>
           <div>
-            <label className="block text-[9px] uppercase tracking-[0.3em] text-white/50 mb-3">Email Address</label>
+            <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">Email Address</label>
             <input 
               type="email" 
               required
@@ -53,7 +53,7 @@ export default function Register() {
             />
           </div>
           <div>
-            <label className="block text-[9px] uppercase tracking-[0.3em] text-white/50 mb-3">Password</label>
+            <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">Password</label>
             <input 
               type="password" 
               required
@@ -66,7 +66,7 @@ export default function Register() {
           <div className="pt-4">
             <button 
               type="submit" 
-              className="w-full py-4 bg-white text-black text-[10px] uppercase tracking-[0.3em] font-semibold hover:bg-luxury-gold hover:text-white transition-all duration-300"
+              className="w-full py-4 bg-white text-black text-xs uppercase tracking-[0.3em] font-semibold hover:bg-luxury-gold hover:text-white transition-all duration-300"
             >
               Create Account
             </button>
@@ -74,8 +74,8 @@ export default function Register() {
         </form>
 
         <div className="mt-12 text-center border-t border-white/10 pt-8">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-4">Already have an account?</p>
-          <Link to="/login" className="text-xs text-white border-b border-white/30 pb-1 hover:border-white transition-colors">
+          <p className="text-xs uppercase tracking-[0.2em] text-white/50 mb-4">Already have an account?</p>
+          <Link to="/login" className="text-[13px] text-white border-b border-white/30 pb-1 hover:border-white transition-colors">
             Sign In
           </Link>
         </div>

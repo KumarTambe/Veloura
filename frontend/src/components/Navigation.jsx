@@ -15,7 +15,7 @@ export default function Navigation() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -25,24 +25,24 @@ export default function Navigation() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-[padding,background-color,border-color] duration-300 border-b ${
           isScrolled ? 'py-4 bg-luxury-black/95 backdrop-blur-sm border-white/10' : 'py-8 bg-transparent border-transparent'
         }`}
       >
         <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center">
           {/* Desktop Links (Left) */}
           <div className="hidden md:flex items-center space-x-12 w-1/3">
-            <Link to="/shop" className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
+            <Link to="/shop" className="text-xs uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300">
               Shop
             </Link>
             {['Collections', 'Masterpieces'].map((item) => (
-              <a
+              <Link
                 key={item}
-                href={`/#${item.toLowerCase()}`}
-                className="text-[10px] uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300"
+                to={`/#${item.toLowerCase()}`}
+                className="text-xs uppercase tracking-[0.2em] text-white/50 hover:text-white transition-colors duration-300"
               >
                 {item}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -58,36 +58,36 @@ export default function Navigation() {
             {user ? (
               <div className="hidden md:flex items-center gap-4">
                 <Link to="/profile" className="flex items-center gap-2 text-white/50 hover:text-white transition-colors">
-                  <User size={16} strokeWidth={1.5} />
-                  <span className="text-[10px] uppercase tracking-widest">{user.username}</span>
+                  <User size={19} strokeWidth={1.5} />
+                  <span className="text-xs uppercase tracking-widest">{user.username}</span>
                 </Link>
-                <Link to="/orders" className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
+                <Link to="/orders" className="text-xs uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors">
                   Orders
                 </Link>
                 {user.role === 'admin' && (
-                  <Link to="/admin/dashboard" className="text-[10px] uppercase tracking-[0.2em] text-luxury-gold hover:text-white transition-colors">
+                  <Link to="/admin/dashboard" className="text-xs uppercase tracking-[0.2em] text-luxury-gold hover:text-white transition-colors">
                     Admin
                   </Link>
                 )}
-                <button onClick={logout} className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white transition-colors">
+                <button onClick={logout} className="text-xs uppercase tracking-[0.2em] text-white/40 hover:text-white transition-colors">
                   Logout
                 </button>
               </div>
             ) : (
               <Link to="/login" className="hidden md:flex items-center gap-2 text-white/50 hover:text-white transition-colors">
-                <User size={16} strokeWidth={1.5} />
+                <User size={19} strokeWidth={1.5} />
               </Link>
             )}
             <button 
               onClick={() => window.dispatchEvent(new CustomEvent('openSearch'))}
               className="text-white/50 hover:text-white transition-colors"
             >
-              <Search size={16} strokeWidth={1.5} />
+              <Search size={19} strokeWidth={1.5} />
             </button>
             <button onClick={() => setIsCartOpen(true)} className="text-white/50 hover:text-white transition-colors relative">
-              <ShoppingBag size={16} strokeWidth={1.5} />
+              <ShoppingBag size={19} strokeWidth={1.5} />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-2 text-[8px] text-luxury-gold tracking-tighter">
+                <span className="absolute -top-1 -right-2 text-[10px] text-luxury-gold tracking-tighter">
                   {cartCount}
                 </span>
               )}
@@ -96,7 +96,7 @@ export default function Navigation() {
               className="md:hidden text-white/50 hover:text-white"
               onClick={() => setIsMobileMenuOpen(true)}
             >
-              <Menu size={20} strokeWidth={1.5} />
+              <Menu size={22} strokeWidth={1.5} />
             </button>
           </div>
         </div>
@@ -119,19 +119,44 @@ export default function Navigation() {
             </button>
             
             <div className="flex flex-col items-center space-y-10">
-              {['Collections', 'Masterpieces', 'Heritage', 'Boutiques'].map((item, i) => (
-                <motion.a
+              {[
+                { label: 'Shop', to: '/shop' },
+                { label: 'Collections', to: '/#collections' },
+                { label: 'Masterpieces', to: '/#masterpieces' },
+                ...(user
+                  ? [
+                      { label: 'Profile', to: '/profile' },
+                      { label: 'Orders', to: '/orders' },
+                      ...(user.role === 'admin' ? [{ label: 'Admin', to: '/admin/dashboard' }] : []),
+                    ]
+                  : [{ label: 'Login', to: '/login' }]),
+              ].map((item, i) => (
+                <motion.div
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: i * 0.1 }}
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  className="text-sm uppercase tracking-[0.3em] text-white/70 hover:text-white transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  transition={{ delay: i * 0.06 }}
+                  key={item.label}
                 >
-                  {item}
-                </motion.a>
+                  <Link
+                    to={item.to}
+                    className="text-base uppercase tracking-[0.3em] text-white/70 hover:text-white transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                </motion.div>
               ))}
+              {user && (
+                <button
+                  onClick={() => {
+                    logout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-base uppercase tracking-[0.3em] text-white/50 hover:text-white transition-colors"
+                >
+                  Logout
+                </button>
+              )}
             </div>
           </motion.div>
         )}

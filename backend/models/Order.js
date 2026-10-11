@@ -44,6 +44,12 @@ const orderSchema = new mongoose.Schema(
     paidAt: {
       type: Date,
     },
+    // Set when the Razorpay order is created, before the user pays
+    razorpayOrderId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
     paymentResult: {
       id: { type: String },
       orderId: { type: String },
@@ -60,7 +66,7 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      default: 'Pending', // Pending, Processing, Shipped, Delivered, Cancelled
+      default: 'Pending', // Pending, Processing, Shipped, Delivered, Cancelled, Refunded
     },
   },
   {

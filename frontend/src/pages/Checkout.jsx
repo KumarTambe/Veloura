@@ -5,8 +5,35 @@ import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { API_URL } from '../config/api';
 
+const EMPTY_SHIPPING = {
+  firstName: '',
+  lastName: '',
+  street: '',
+  city: '',
+  state: '',
+  zipCode: '',
+  country: '',
+};
+
+// Load Razorpay's checkout script only when the user actually pays
+let razorpayScript;
+const loadRazorpay = () => {
+  if (window.Razorpay) return Promise.resolve();
+  razorpayScript ??= new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = resolve;
+    script.onerror = () => {
+      razorpayScript = undefined;
+      reject(new Error('Could not load the payment gateway. Check your connection and try again.'));
+    };
+    document.body.appendChild(script);
+  });
+  return razorpayScript;
+};
+
 export default function Checkout() {
-  const { cartItems, cartTotal, clearCart } = useCart();
+  const { cartItems, cartTotal, resetCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -16,15 +43,7 @@ export default function Checkout() {
   const [savedAddress, setSavedAddress] = useState(null);
   const [useSavedAddress, setUseSavedAddress] = useState(false);
 
-  const [shipping, setShipping] = useState({
-    firstName: '',
-    lastName: '',
-    street: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: '',
-  });
+  const [shipping, setShipping] = useState(EMPTY_SHIPPING);
 
   // Fetch saved address on mount
   useEffect(() => {
@@ -48,31 +67,25 @@ export default function Checkout() {
     fetchProfile();
   }, [user]);
 
-  // When user toggles to saved address, pre-fill the form
-  useEffect(() => {
-    if (useSavedAddress && savedAddress) {
-      const nameParts = (savedAddress.fullName || '').split(' ');
-      setShipping({
-        firstName: nameParts[0] || '',
-        lastName: nameParts.slice(1).join(' ') || '',
-        street: savedAddress.street || '',
-        city: savedAddress.city || '',
-        state: savedAddress.state || '',
-        zipCode: savedAddress.zipCode || '',
-        country: savedAddress.country || '',
-      });
-    } else if (!useSavedAddress) {
-      setShipping({
-        firstName: '',
-        lastName: '',
-        street: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        country: '',
-      });
-    }
-  }, [useSavedAddress, savedAddress]);
+  // Pre-fill the form from the saved address, or clear it for a new one
+  const selectSavedAddress = () => {
+    const nameParts = (savedAddress.fullName || '').split(' ');
+    setUseSavedAddress(true);
+    setShipping({
+      firstName: nameParts[0] || '',
+      lastName: nameParts.slice(1).join(' ') || '',
+      street: savedAddress.street || '',
+      city: savedAddress.city || '',
+      state: savedAddress.state || '',
+      zipCode: savedAddress.zipCode || '',
+      country: savedAddress.country || '',
+    });
+  };
+
+  const selectNewAddress = () => {
+    setUseSavedAddress(false);
+    setShipping(EMPTY_SHIPPING);
+  };
 
   const handleShippingChange = (e) => {
     setShipping({ ...shipping, [e.target.name]: e.target.value });
@@ -89,49 +102,47 @@ export default function Checkout() {
 
       setLoading(true);
       try {
-        // 1. Get Razorpay key
-        const keyRes = await fetch(`${API_URL}/api/payment/key`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        const { keyId } = await keyRes.json();
+        const authHeaders = {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.token}`,
+        };
 
-        if (!keyId) {
-           alert('Payment gateway configuration missing. Please ensure RAZORPAY_KEY_ID is set in the backend .env file.');
-           setLoading(false);
-           return;
-        }
+        // 1. Create a Pending order; the server prices it from the cart in the DB
+        const [createRes] = await Promise.all([
+          fetch(`${API_URL}/api/payment/create-order`, {
+            method: 'POST',
+            headers: authHeaders,
+            body: JSON.stringify({
+              shippingAddress: {
+                street: shipping.street,
+                city: shipping.city,
+                state: shipping.state,
+                zipCode: shipping.zipCode,
+                country: shipping.country,
+              },
+            }),
+          }),
+          loadRazorpay(),
+        ]);
 
-        // 2. Create Order on our backend
-        const createRes = await fetch(`${API_URL}/api/payment/create-order`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${user.token}`,
-          },
-          body: JSON.stringify({ amount: cartTotal }),
-        });
-        
         const orderData = await createRes.json();
         if (!createRes.ok) throw new Error(orderData.message || 'Could not create order');
 
-        // 3. Open Razorpay Checkout Modal
+        // 2. Open Razorpay Checkout Modal
         const options = {
-          key: keyId,
+          key: orderData.keyId,
           amount: orderData.amount,
           currency: orderData.currency,
           name: 'Veloura Premium',
           description: 'Luxury Watch Purchase',
-          order_id: orderData.id,
+          order_id: orderData.razorpayOrderId,
           handler: async function (response) {
             try {
               setLoading(true);
-              // 4. Verify payment on our backend
+              // 3. Verify payment; the server marks the order paid, reduces stock and clears the cart
               const verifyRes = await fetch(`${API_URL}/api/payment/verify`, {
                 method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${user.token}`,
-                },
+                headers: authHeaders,
                 body: JSON.stringify({
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_payment_id: response.razorpay_payment_id,
@@ -139,50 +150,11 @@ export default function Checkout() {
                 }),
               });
 
-              const verifyData = await verifyRes.json();
-              if (!verifyRes.ok) throw new Error(verifyData.message || 'Payment verification failed');
+              const paidOrder = await verifyRes.json();
+              if (!verifyRes.ok) throw new Error(paidOrder.message || 'Payment verification failed');
 
-              // 5. Create final order in DB
-              const finalOrderData = {
-                orderItems: cartItems.map((item) => ({
-                  name: item.name,
-                  quantity: item.quantity,
-                  price: item.price,
-                  product: item._id,
-                })),
-                shippingAddress: {
-                  street: shipping.street,
-                  city: shipping.city,
-                  state: shipping.state,
-                  zipCode: shipping.zipCode,
-                  country: shipping.country,
-                },
-                paymentMethod: 'Razorpay',
-                totalPrice: cartTotal,
-                paymentResult: {
-                  id: response.razorpay_payment_id,
-                  orderId: response.razorpay_order_id,
-                  signature: response.razorpay_signature,
-                }
-              };
-
-              const res = await fetch(`${API_URL}/api/orders`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${user.token}`,
-                },
-                body: JSON.stringify(finalOrderData),
-              });
-
-              const dbOrderData = await res.json();
-
-              if (res.ok) {
-                await clearCart();
-                navigate(`/order/${dbOrderData._id}`);
-              } else {
-                alert(dbOrderData.message || 'Failed to record order');
-              }
+              resetCart();
+              navigate(`/order/${paidOrder._id}`);
             } catch (error) {
               console.error('Verification error:', error);
               alert(error.message || 'An error occurred during verification.');
@@ -190,10 +162,12 @@ export default function Checkout() {
               setLoading(false);
             }
           },
+          modal: {
+            ondismiss: () => setLoading(false),
+          },
           prefill: {
             name: `${shipping.firstName} ${shipping.lastName}`,
             email: user.email,
-            contact: '9999999999',
           },
           theme: {
             color: '#C5A059', // Veloura Gold
@@ -220,7 +194,7 @@ export default function Checkout() {
     return (
       <div className="min-h-screen pt-32 flex flex-col items-center justify-center">
         <p className="text-sm tracking-widest uppercase mb-6">Your cart is empty.</p>
-        <button onClick={() => navigate('/')} className="border-b border-white pb-1 text-xs uppercase">Return Home</button>
+        <button onClick={() => navigate('/')} className="border-b border-white pb-1 text-[13px] uppercase">Return Home</button>
       </div>
     );
   }
@@ -233,10 +207,10 @@ export default function Checkout() {
         
         <div className="flex justify-between items-center mb-16 border-b border-white/10 pb-8">
           <h1 className="text-2xl font-serif tracking-[0.3em] text-white">SECURE CHECKOUT</h1>
-          <div className="flex space-x-4 text-[10px] uppercase tracking-[0.2em] font-mono">
-            <span className={step === 1 ? 'text-white' : 'text-white/30'}>1. Shipping</span>
-            <span className="text-white/30">/</span>
-            <span className={step === 2 ? 'text-white' : 'text-white/30'}>2. Confirm & Pay</span>
+          <div className="flex space-x-4 text-xs uppercase tracking-[0.2em] font-mono">
+            <span className={step === 1 ? 'text-white' : 'text-white/40'}>1. Shipping</span>
+            <span className="text-white/40">/</span>
+            <span className={step === 2 ? 'text-white' : 'text-white/40'}>2. Confirm & Pay</span>
           </div>
         </div>
 
@@ -253,7 +227,7 @@ export default function Checkout() {
                       <div className="flex gap-3">
                         <button
                           type="button"
-                          onClick={() => setUseSavedAddress(true)}
+                          onClick={selectSavedAddress}
                           className={`flex-1 p-4 border text-left transition-all duration-300 ${
                             useSavedAddress
                               ? 'border-luxury-gold/50 bg-luxury-gold/5'
@@ -266,9 +240,9 @@ export default function Checkout() {
                             }`}>
                               {useSavedAddress && <div className="w-2 h-2 rounded-full bg-luxury-gold"></div>}
                             </div>
-                            <span className="text-[10px] uppercase tracking-[0.2em] text-white/70">Saved Address</span>
+                            <span className="text-xs uppercase tracking-[0.2em] text-white/70">Saved Address</span>
                           </div>
-                          <p className="text-xs text-white/50 leading-relaxed pl-7">
+                          <p className="text-[13px] text-white/50 leading-relaxed pl-7">
                             {savedAddress.street}<br />
                             {savedAddress.city}, {savedAddress.state} {savedAddress.zipCode}<br />
                             {savedAddress.country}
@@ -277,7 +251,7 @@ export default function Checkout() {
 
                         <button
                           type="button"
-                          onClick={() => setUseSavedAddress(false)}
+                          onClick={selectNewAddress}
                           className={`flex-1 p-4 border text-left transition-all duration-300 ${
                             !useSavedAddress
                               ? 'border-luxury-gold/50 bg-luxury-gold/5'
@@ -290,9 +264,9 @@ export default function Checkout() {
                             }`}>
                               {!useSavedAddress && <div className="w-2 h-2 rounded-full bg-luxury-gold"></div>}
                             </div>
-                            <span className="text-[10px] uppercase tracking-[0.2em] text-white/70">New Address</span>
+                            <span className="text-xs uppercase tracking-[0.2em] text-white/70">New Address</span>
                           </div>
-                          <p className="text-xs text-white/30 pl-7 mt-3">
+                          <p className="text-[13px] text-white/40 pl-7 mt-3">
                             Enter a different shipping address
                           </p>
                         </button>
@@ -330,7 +304,7 @@ export default function Checkout() {
                   {/* Summary when using saved address */}
                   {useSavedAddress && savedAddress && (
                     <div className="p-6 border border-white/10 bg-white/[0.02]">
-                      <p className="text-[9px] uppercase tracking-[0.2em] text-white/40 mb-3">Delivering To</p>
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-white/50 mb-3">Delivering To</p>
                       <p className="text-sm text-white/80 leading-relaxed">
                         {savedAddress.fullName}<br />
                         {savedAddress.street}<br />
@@ -347,7 +321,7 @@ export default function Checkout() {
                   <h2 className="text-sm uppercase tracking-widest text-white/50 mb-6">Confirm & Pay</h2>
                   
                   <div className="space-y-4 border-b border-white/10 pb-6">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">Shipping To</p>
+                    <p className="text-xs uppercase tracking-[0.2em] text-white/50">Shipping To</p>
                     <p className="text-sm text-white/80">
                       {shipping.firstName} {shipping.lastName}<br />
                       {shipping.street}<br />
@@ -356,15 +330,15 @@ export default function Checkout() {
                     </p>
                   </div>
 
-                  <p className="text-xs text-white/60 leading-relaxed">
+                  <p className="text-[13px] text-white/60 leading-relaxed">
                     By proceeding, you will be securely redirected to Razorpay to complete your payment. 
                     Your item will be shipped securely via armored courier within 2-3 business days upon payment confirmation.
                   </p>
                   
                   <div className="p-4 bg-luxury-gold/5 border border-luxury-gold/20 rounded">
-                    <p className="text-[10px] uppercase tracking-widest text-luxury-gold mb-1">Test Mode Notice</p>
-                    <p className="text-[10px] text-white/50 leading-relaxed">
-                      Razorpay limits test transactions significantly. If your cart exceeds this, the payment popup will show ₹100 to allow the test to succeed, but your actual order will be recorded correctly. Please use an <strong>Indian</strong> test card or Netbanking.
+                    <p className="text-xs uppercase tracking-widest text-luxury-gold mb-1">Test Mode Notice</p>
+                    <p className="text-xs text-white/50 leading-relaxed">
+                      Payments run in Razorpay test mode. Use an <strong>Indian</strong> test card or Netbanking; no real money is charged.
                     </p>
                   </div>
                 </motion.div>
@@ -372,14 +346,14 @@ export default function Checkout() {
 
               <div className="mt-12 flex justify-between items-center">
                 {step > 1 ? (
-                  <button type="button" onClick={() => setStep(step - 1)} className="text-[10px] uppercase tracking-widest text-white/50 hover:text-white transition-colors border-b border-transparent hover:border-white">
+                  <button type="button" onClick={() => setStep(step - 1)} className="text-xs uppercase tracking-widest text-white/50 hover:text-white transition-colors border-b border-transparent hover:border-white">
                     Back
                   </button>
                 ) : <div></div>}
                 <button 
                   type="submit" 
                   disabled={loading}
-                  className={`px-12 py-4 text-[10px] uppercase tracking-[0.3em] font-semibold transition-all duration-300 ${
+                  className={`px-12 py-4 text-xs uppercase tracking-[0.3em] font-semibold transition-all duration-300 ${
                     loading 
                       ? 'bg-white/30 text-white/50 cursor-not-allowed' 
                       : 'bg-white text-black hover:bg-luxury-gold hover:text-white'
@@ -392,21 +366,21 @@ export default function Checkout() {
           </div>
 
           <div className="md:col-span-1 border-t md:border-t-0 md:border-l border-white/10 pt-8 md:pt-0 md:pl-8">
-            <h3 className="text-[10px] uppercase tracking-widest text-white/50 mb-8">Order Summary</h3>
+            <h3 className="text-xs uppercase tracking-widest text-white/50 mb-8">Order Summary</h3>
             <div className="space-y-6 mb-8">
               {cartItems.map(item => (
                 <div key={item._id} className="flex justify-between items-center">
                   <div>
-                    <p className="text-xs font-serif">{item.name}</p>
-                    <p className="text-[8px] uppercase tracking-widest text-white/40">Qty: {item.quantity}</p>
+                    <p className="text-[13px] font-serif">{item.name}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-white/50">Qty: {item.quantity}</p>
                   </div>
-                  <p className="text-xs font-mono">₹{item.price?.toLocaleString()}</p>
+                  <p className="text-[13px] font-mono">₹{item.price?.toLocaleString()}</p>
                 </div>
               ))}
             </div>
             <div className="border-t border-white/10 pt-6">
               <div className="flex justify-between items-center">
-                <span className="text-xs uppercase tracking-widest">Total</span>
+                <span className="text-[13px] uppercase tracking-widest">Total</span>
                 <span className="text-sm font-mono tracking-wider">₹{cartTotal.toLocaleString()}</span>
               </div>
             </div>

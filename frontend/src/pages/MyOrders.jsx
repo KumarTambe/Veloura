@@ -35,8 +35,8 @@ export default function MyOrders() {
   if (!user) {
     return (
       <div className="min-h-screen pt-32 pb-20 bg-luxury-black flex flex-col items-center justify-center gap-6">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-white/50">Please log in to view your orders</p>
-        <Link to="/login" className="text-white text-[10px] uppercase tracking-[0.3em] border-b border-white/30 pb-1 hover:border-white transition-colors">
+        <p className="text-xs uppercase tracking-[0.3em] text-white/50">Please log in to view your orders</p>
+        <Link to="/login" className="text-white text-xs uppercase tracking-[0.3em] border-b border-white/30 pb-1 hover:border-white transition-colors">
           Sign In
         </Link>
       </div>
@@ -46,7 +46,7 @@ export default function MyOrders() {
   if (loading) {
     return (
       <div className="min-h-screen bg-luxury-black flex items-center justify-center">
-        <div className="text-white/50 text-[10px] uppercase tracking-[0.3em]">Loading...</div>
+        <div className="text-white/50 text-xs uppercase tracking-[0.3em]">Loading...</div>
       </div>
     );
   }
@@ -61,13 +61,13 @@ export default function MyOrders() {
         >
           <div className="mb-16">
             <h1 className="text-2xl font-serif tracking-[0.3em] text-white mb-4">MY ORDERS</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">Your purchase history</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-white/50">Your purchase history</p>
           </div>
 
           {orders.length === 0 ? (
             <div className="text-center py-20 border border-white/5">
               <p className="text-sm text-white/50 mb-6 font-serif italic">No orders yet.</p>
-              <Link to="/" className="text-[10px] uppercase tracking-[0.3em] text-white border-b border-white/30 pb-1 hover:border-white transition-colors">
+              <Link to="/" className="text-xs uppercase tracking-[0.3em] text-white border-b border-white/30 pb-1 hover:border-white transition-colors">
                 Browse Collection
               </Link>
             </div>
@@ -85,11 +85,11 @@ export default function MyOrders() {
                       {/* Order Header */}
                       <div className="flex justify-between items-start mb-6">
                         <div>
-                          <p className="text-[9px] uppercase tracking-[0.2em] text-white/30 mb-2">Order ID</p>
-                          <p className="text-xs font-mono text-white/70">{order._id}</p>
+                          <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 mb-2">Order ID</p>
+                          <p className="text-[13px] font-mono text-white/70">{order._id}</p>
                         </div>
                         <div className="text-right">
-                          <span className={`inline-block text-[9px] uppercase tracking-[0.2em] px-3 py-1 border ${
+                          <span className={`inline-block text-[11px] uppercase tracking-[0.2em] px-3 py-1 border ${
                             order.status === 'Delivered' ? 'border-green-500/30 text-green-400' :
                             order.status === 'Processing' ? 'border-luxury-gold/30 text-luxury-gold' :
                             order.status === 'Shipped' ? 'border-blue-400/30 text-blue-400' :
@@ -103,19 +103,19 @@ export default function MyOrders() {
                       {/* Order Items Preview */}
                       <div className="flex justify-between items-end">
                         <div>
-                          <p className="text-[9px] uppercase tracking-[0.2em] text-white/30 mb-2">Items</p>
+                          <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 mb-2">Items</p>
                           <div className="space-y-1">
                             {order.orderItems.map((item, i) => (
                               <p key={i} className="text-sm font-serif text-white/80">
-                                {item.name} <span className="text-white/30 text-[10px]">× {item.quantity}</span>
+                                {item.name} <span className="text-white/40 text-xs">× {item.quantity}</span>
                               </p>
                             ))}
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-[9px] uppercase tracking-[0.2em] text-white/30 mb-2">Total</p>
+                          <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 mb-2">Total</p>
                           <p className="text-lg font-mono text-white">₹{order.totalPrice?.toLocaleString()}</p>
-                          <p className="text-[9px] text-white/30 mt-2">
+                          <p className="text-[11px] text-white/40 mt-2">
                             {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </p>
                         </div>
@@ -123,7 +123,7 @@ export default function MyOrders() {
 
                       {/* Hover hint */}
                       <div className="mt-4 pt-4 border-t border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <p className="text-[9px] uppercase tracking-[0.2em] text-white/30 text-right">View Details →</p>
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-white/40 text-right">View Details →</p>
                       </div>
                     </div>
                   </Link>

@@ -21,56 +21,50 @@ const transformServerCart = (serverCart) => {
     }));
 };
 
+const readGuestCart = () => {
+  try {
+    return JSON.parse(localStorage.getItem('guestCart')) || [];
+  } catch {
+    return [];
+  }
+};
+
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { user } = useAuth();
 
-  // Get token helper
-  const getToken = useCallback(() => {
-    if (user && user.token) return user.token;
-    const stored = localStorage.getItem('userInfo');
-    if (stored) {
-      try {
-        return JSON.parse(stored).token;
-      } catch {
-        return null;
-      }
-    }
-    return null;
-  }, [user]);
+  const token = user?.token || null;
 
-  const isLoggedIn = useCallback(() => !!getToken(), [getToken]);
+  const getToken = useCallback(() => token, [token]);
+  const isLoggedIn = useCallback(() => !!token, [token]);
 
-  // Load cart on mount or when user changes
+  // When the logged-in user changes, swap carts during render (no effect needed):
+  // guests read localStorage, logged-in users start empty until the fetch below lands
+  const [cartOwner, setCartOwner] = useState(undefined);
+  if (cartOwner !== token) {
+    setCartOwner(token);
+    setCartItems(token ? [] : readGuestCart());
+  }
+
+  // Logged in — fetch cart from backend
   useEffect(() => {
-    const token = getToken();
-    if (token) {
-      // Logged in — fetch cart from backend
-      fetch(`${API_URL}/api/cart`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (Array.isArray(data)) {
-            setCartItems(transformServerCart(data));
-          }
-        })
-        .catch((err) => console.error('Failed to fetch cart:', err));
-    } else {
-      // Guest — load from localStorage
-      const saved = localStorage.getItem('guestCart');
-      if (saved) {
-        try {
-          setCartItems(JSON.parse(saved));
-        } catch {
-          setCartItems([]);
+    if (!token) return;
+    let cancelled = false;
+    fetch(`${API_URL}/api/cart`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && Array.isArray(data)) {
+          setCartItems(transformServerCart(data));
         }
-      } else {
-        setCartItems([]);
-      }
-    }
-  }, [user, getToken]);
+      })
+      .catch((err) => console.error('Failed to fetch cart:', err));
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
   // Save guest cart to localStorage whenever it changes (only for guests)
   useEffect(() => {
@@ -202,6 +196,9 @@ export function CartProvider({ children }) {
     }
   };
 
+  // Server already emptied the cart (e.g. after a verified payment); just sync the UI
+  const resetCart = () => setCartItems([]);
+
   const cartTotal = cartItems.reduce((total, item) => {
     return total + (item.price * item.quantity);
   }, 0);
@@ -217,6 +214,7 @@ export function CartProvider({ children }) {
         addToCart,
         removeFromCart,
         clearCart,
+        resetCart,
         updateQuantity,
         cartTotal,
         cartCount,
@@ -227,4 +225,5 @@ export function CartProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => useContext(CartContext);

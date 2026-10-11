@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -11,21 +10,27 @@ export default function AdminProducts() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/products`);
-      const data = await res.json();
-      setProducts(data.products || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [reloadKey, setReloadKey] = useState(0);
+  const fetchProducts = () => setReloadKey((k) => k + 1);
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/products`);
+        const data = await res.json();
+        if (!cancelled) setProducts(data.products || []);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadKey]);
 
   const handleCreateProduct = async () => {
     try {
@@ -89,7 +94,7 @@ export default function AdminProducts() {
 
         <div className="overflow-x-auto border border-white/10">
           <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-white/5 border-b border-white/10 uppercase tracking-widest text-[10px] text-white/50">
+            <thead className="bg-white/5 border-b border-white/10 uppercase tracking-widest text-xs text-white/50">
               <tr>
                 <th className="p-4">ID</th>
                 <th className="p-4">Name</th>
@@ -109,7 +114,7 @@ export default function AdminProducts() {
                   <td className="p-4 text-white/70">{product.category}</td>
                   <td className="p-4 text-white/70">{product.brand}</td>
                   <td className="p-4">
-                    <span className={`px-2 py-1 text-[10px] uppercase tracking-wider ${product.stockQuantity > 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                    <span className={`px-2 py-1 text-xs uppercase tracking-wider ${product.stockQuantity > 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
                       {product.stockQuantity > 0 ? `${product.stockQuantity} In Stock` : 'Out of Stock'}
                     </span>
                   </td>

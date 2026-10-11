@@ -79,14 +79,14 @@ export default function Shop() {
           className="mb-12"
         >
           <h1 className="text-3xl font-serif tracking-[0.3em] text-white mb-3">SHOP</h1>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">Explore the full Veloura collection</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-white/50">Explore the full Veloura collection</p>
         </motion.div>
 
         {/* Search + Controls Bar */}
         <div className="flex flex-col md:flex-row gap-4 mb-10">
           {/* Search Input */}
           <div className="relative flex-1">
-            <svg className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+            <svg className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
             <input
@@ -103,7 +103,7 @@ export default function Shop() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="bg-transparent border-b border-white/15 pb-3 text-[10px] uppercase tracking-[0.15em] text-white/60 outline-none cursor-pointer focus:border-white/40 transition-colors appearance-none pr-6"
+              className="bg-transparent border-b border-white/15 pb-3 text-xs uppercase tracking-[0.15em] text-white/60 outline-none cursor-pointer focus:border-white/40 transition-colors appearance-none pr-6"
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0 center' }}
             >
               <option value="newest" className="bg-black">Newest</option>
@@ -115,7 +115,7 @@ export default function Shop() {
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`text-[10px] uppercase tracking-[0.15em] pb-3 border-b transition-colors ${
+              className={`text-xs uppercase tracking-[0.15em] pb-3 border-b transition-colors ${
                 showFilters || activeFiltersCount > 0
                   ? 'text-luxury-gold border-luxury-gold/30'
                   : 'text-white/50 border-white/15 hover:text-white hover:border-white/40'
@@ -139,12 +139,12 @@ export default function Shop() {
               <div className="border border-white/10 p-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
                 {/* Category Filter */}
                 <div>
-                  <p className="text-[9px] uppercase tracking-[0.3em] text-white/40 mb-4">Category</p>
+                  <p className="text-[11px] uppercase tracking-[0.3em] text-white/50 mb-4">Category</p>
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => setSelectedCategory('')}
-                      className={`px-3 py-1.5 text-[9px] uppercase tracking-[0.15em] border transition-all ${
-                        !selectedCategory ? 'border-luxury-gold/50 text-luxury-gold bg-luxury-gold/5' : 'border-white/10 text-white/40 hover:border-white/20'
+                      className={`px-3 py-1.5 text-[11px] uppercase tracking-[0.15em] border transition-all ${
+                        !selectedCategory ? 'border-luxury-gold/50 text-luxury-gold bg-luxury-gold/5' : 'border-white/10 text-white/50 hover:border-white/20'
                       }`}
                     >
                       All
@@ -153,8 +153,8 @@ export default function Shop() {
                       <button
                         key={cat}
                         onClick={() => setSelectedCategory(selectedCategory === cat ? '' : cat)}
-                        className={`px-3 py-1.5 text-[9px] uppercase tracking-[0.15em] border transition-all ${
-                          selectedCategory === cat ? 'border-luxury-gold/50 text-luxury-gold bg-luxury-gold/5' : 'border-white/10 text-white/40 hover:border-white/20'
+                        className={`px-3 py-1.5 text-[11px] uppercase tracking-[0.15em] border transition-all ${
+                          selectedCategory === cat ? 'border-luxury-gold/50 text-luxury-gold bg-luxury-gold/5' : 'border-white/10 text-white/50 hover:border-white/20'
                         }`}
                       >
                         {cat}
@@ -165,12 +165,12 @@ export default function Shop() {
 
                 {/* Brand Filter */}
                 <div>
-                  <p className="text-[9px] uppercase tracking-[0.3em] text-white/40 mb-4">Brand</p>
+                  <p className="text-[11px] uppercase tracking-[0.3em] text-white/50 mb-4">Brand</p>
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => setSelectedBrand('')}
-                      className={`px-3 py-1.5 text-[9px] uppercase tracking-[0.15em] border transition-all ${
-                        !selectedBrand ? 'border-luxury-gold/50 text-luxury-gold bg-luxury-gold/5' : 'border-white/10 text-white/40 hover:border-white/20'
+                      className={`px-3 py-1.5 text-[11px] uppercase tracking-[0.15em] border transition-all ${
+                        !selectedBrand ? 'border-luxury-gold/50 text-luxury-gold bg-luxury-gold/5' : 'border-white/10 text-white/50 hover:border-white/20'
                       }`}
                     >
                       All
@@ -179,8 +179,8 @@ export default function Shop() {
                       <button
                         key={b}
                         onClick={() => setSelectedBrand(selectedBrand === b ? '' : b)}
-                        className={`px-3 py-1.5 text-[9px] uppercase tracking-[0.15em] border transition-all ${
-                          selectedBrand === b ? 'border-luxury-gold/50 text-luxury-gold bg-luxury-gold/5' : 'border-white/10 text-white/40 hover:border-white/20'
+                        className={`px-3 py-1.5 text-[11px] uppercase tracking-[0.15em] border transition-all ${
+                          selectedBrand === b ? 'border-luxury-gold/50 text-luxury-gold bg-luxury-gold/5' : 'border-white/10 text-white/50 hover:border-white/20'
                         }`}
                       >
                         {b}
@@ -191,14 +191,14 @@ export default function Shop() {
 
                 {/* Price Range Filter */}
                 <div>
-                  <p className="text-[9px] uppercase tracking-[0.3em] text-white/40 mb-4">Price Range</p>
+                  <p className="text-[11px] uppercase tracking-[0.3em] text-white/50 mb-4">Price Range</p>
                   <div className="flex flex-wrap gap-2">
                     {priceRanges.map((range) => (
                       <button
                         key={range.value}
                         onClick={() => setPriceRange(priceRange === range.value ? '' : range.value)}
-                        className={`px-3 py-1.5 text-[9px] uppercase tracking-[0.15em] border transition-all ${
-                          priceRange === range.value ? 'border-luxury-gold/50 text-luxury-gold bg-luxury-gold/5' : 'border-white/10 text-white/40 hover:border-white/20'
+                        className={`px-3 py-1.5 text-[11px] uppercase tracking-[0.15em] border transition-all ${
+                          priceRange === range.value ? 'border-luxury-gold/50 text-luxury-gold bg-luxury-gold/5' : 'border-white/10 text-white/50 hover:border-white/20'
                         }`}
                       >
                         {range.label}
@@ -210,7 +210,7 @@ export default function Shop() {
                 {/* Clear Filters */}
                 {activeFiltersCount > 0 && (
                   <div className="sm:col-span-3 pt-2">
-                    <button onClick={clearFilters} className="text-[9px] uppercase tracking-[0.2em] text-white/30 hover:text-white border-b border-transparent hover:border-white/30 transition-colors">
+                    <button onClick={clearFilters} className="text-[11px] uppercase tracking-[0.2em] text-white/40 hover:text-white border-b border-transparent hover:border-white/30 transition-colors">
                       Clear all filters
                     </button>
                   </div>
@@ -222,7 +222,7 @@ export default function Shop() {
 
         {/* Results Count */}
         <div className="mb-8">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-white/30">
+          <p className="text-xs uppercase tracking-[0.2em] text-white/40">
             {loading ? 'Loading...' : `${products.length} timepiece${products.length !== 1 ? 's' : ''} found`}
           </p>
         </div>
@@ -230,12 +230,12 @@ export default function Shop() {
         {/* Product Grid */}
         {loading ? (
           <div className="flex justify-center items-center py-32">
-            <div className="text-white/30 text-[10px] uppercase tracking-[0.3em]">Loading collection...</div>
+            <div className="text-white/40 text-xs uppercase tracking-[0.3em]">Loading collection...</div>
           </div>
         ) : products.length === 0 ? (
           <div className="flex flex-col justify-center items-center py-32 gap-6">
-            <p className="text-sm text-white/40 font-serif italic">No watches match your criteria.</p>
-            <button onClick={clearFilters} className="text-[10px] uppercase tracking-[0.3em] text-white border-b border-white/30 pb-1 hover:border-white transition-colors">
+            <p className="text-sm text-white/50 font-serif italic">No watches match your criteria.</p>
+            <button onClick={clearFilters} className="text-xs uppercase tracking-[0.3em] text-white border-b border-white/30 pb-1 hover:border-white transition-colors">
               Clear Filters
             </button>
           </div>
@@ -251,13 +251,13 @@ export default function Shop() {
               >
                 <Link to={`/product/${product._id}`}>
                   <div className="w-full aspect-[3/4] bg-luxury-charcoal overflow-hidden mb-5 relative">
-                    <img
+                    <img loading="lazy" decoding="async"
                       src={product.images && product.images.length > 0 ? product.images[0] : ''}
                       alt={product.name}
-                      className="w-full h-full object-cover object-center opacity-75 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
+                      className="w-full h-full object-cover object-center opacity-75 group-hover:opacity-100 transition-[opacity,transform] duration-700 group-hover:scale-105"
                     />
                     {/* Category badge */}
-                    <span className="absolute top-4 left-4 text-[8px] uppercase tracking-[0.2em] text-white/50 bg-black/40 backdrop-blur-sm px-2 py-1">
+                    <span className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.2em] text-white/50 bg-black/40 backdrop-blur-sm px-2 py-1">
                       {product.category}
                     </span>
                   </div>
@@ -270,10 +270,10 @@ export default function Shop() {
                         {product.name}
                       </h3>
                     </Link>
-                    <p className="text-[9px] uppercase tracking-[0.15em] text-white/30">{product.brand}</p>
+                    <p className="text-[11px] uppercase tracking-[0.15em] text-white/40">{product.brand}</p>
                   </div>
                   <div className="flex flex-col items-end shrink-0">
-                    <p className="text-xs text-white/70 font-mono tracking-wider mb-2">
+                    <p className="text-[13px] text-white/70 font-mono tracking-wider mb-2">
                       ₹{product.price?.toLocaleString()}
                     </p>
                     <button
@@ -282,7 +282,7 @@ export default function Shop() {
                         e.stopPropagation();
                         addToCart(product);
                       }}
-                      className="text-[8px] uppercase tracking-[0.2em] text-white/30 hover:text-white border-b border-transparent hover:border-white/30 transition-colors pb-0.5 cursor-pointer"
+                      className="text-[10px] uppercase tracking-[0.2em] text-white/40 hover:text-white border-b border-transparent hover:border-white/30 transition-colors pb-0.5 cursor-pointer"
                     >
                       Add to Cart
                     </button>

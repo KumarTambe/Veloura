@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { API_URL } from '../config/api';
 
 export default function Profile() {
-  const { user, login } = useAuth();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -115,8 +115,8 @@ export default function Profile() {
   if (!user) {
     return (
       <div className="min-h-screen pt-32 pb-20 bg-luxury-black flex flex-col items-center justify-center gap-6">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-white/50">Please log in to view your profile</p>
-        <Link to="/login" className="text-white text-[10px] uppercase tracking-[0.3em] border-b border-white/30 pb-1 hover:border-white transition-colors">
+        <p className="text-xs uppercase tracking-[0.3em] text-white/50">Please log in to view your profile</p>
+        <Link to="/login" className="text-white text-xs uppercase tracking-[0.3em] border-b border-white/30 pb-1 hover:border-white transition-colors">
           Sign In
         </Link>
       </div>
@@ -126,7 +126,7 @@ export default function Profile() {
   if (loading) {
     return (
       <div className="min-h-screen bg-luxury-black flex items-center justify-center">
-        <div className="text-white/50 text-[10px] uppercase tracking-[0.3em]">Loading...</div>
+        <div className="text-white/50 text-xs uppercase tracking-[0.3em]">Loading...</div>
       </div>
     );
   }
@@ -143,11 +143,11 @@ export default function Profile() {
         >
           <div className="mb-16">
             <h1 className="text-2xl font-serif tracking-[0.3em] text-white mb-4">MY PROFILE</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">Manage your account</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-white/50">Manage your account</p>
           </div>
 
           {message && (
-            <div className={`mb-8 p-4 border text-[10px] uppercase tracking-[0.2em] ${
+            <div className={`mb-8 p-4 border text-xs uppercase tracking-[0.2em] ${
               message.includes('success') ? 'border-green-500/30 text-green-400' : 'border-red-500/30 text-red-400'
             }`}>
               {message}
@@ -157,14 +157,14 @@ export default function Profile() {
           <form onSubmit={handleSubmit} className="space-y-12">
             {/* Account Info */}
             <div>
-              <h2 className="text-[10px] uppercase tracking-[0.3em] text-white/50 mb-8 pb-4 border-b border-white/10">Account Information</h2>
+              <h2 className="text-xs uppercase tracking-[0.3em] text-white/50 mb-8 pb-4 border-b border-white/10">Account Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <label className="block text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">Full Name</label>
+                  <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">Full Name</label>
                   <input type="text" name="username" value={form.username} onChange={handleChange} className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">Email Address</label>
+                  <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">Email Address</label>
                   <input type="email" name="email" value={form.email} onChange={handleChange} className={inputClass} />
                 </div>
               </div>
@@ -172,26 +172,26 @@ export default function Profile() {
 
             {/* Address */}
             <div>
-              <h2 className="text-[10px] uppercase tracking-[0.3em] text-white/50 mb-8 pb-4 border-b border-white/10">Shipping Address</h2>
+              <h2 className="text-xs uppercase tracking-[0.3em] text-white/50 mb-8 pb-4 border-b border-white/10">Shipping Address</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="md:col-span-2">
-                  <label className="block text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">Street Address</label>
+                  <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">Street Address</label>
                   <input type="text" name="street" value={form.street} onChange={handleChange} className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">City</label>
+                  <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">City</label>
                   <input type="text" name="city" value={form.city} onChange={handleChange} className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">State</label>
+                  <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">State</label>
                   <input type="text" name="state" value={form.state} onChange={handleChange} className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">Zip Code</label>
+                  <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">Zip Code</label>
                   <input type="text" name="zipCode" value={form.zipCode} onChange={handleChange} className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">Country</label>
+                  <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">Country</label>
                   <input type="text" name="country" value={form.country} onChange={handleChange} className={inputClass} />
                 </div>
               </div>
@@ -199,14 +199,14 @@ export default function Profile() {
 
             {/* Password */}
             <div>
-              <h2 className="text-[10px] uppercase tracking-[0.3em] text-white/50 mb-8 pb-4 border-b border-white/10">Change Password <span className="text-white/20">(optional)</span></h2>
+              <h2 className="text-xs uppercase tracking-[0.3em] text-white/50 mb-8 pb-4 border-b border-white/10">Change Password <span className="text-white/20">(optional)</span></h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <label className="block text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">New Password</label>
+                  <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">New Password</label>
                   <input type="password" name="password" value={form.password} onChange={handleChange} className={inputClass} placeholder="Leave blank to keep current" />
                 </div>
                 <div>
-                  <label className="block text-[9px] uppercase tracking-[0.3em] text-white/40 mb-3">Confirm Password</label>
+                  <label className="block text-[11px] uppercase tracking-[0.3em] text-white/50 mb-3">Confirm Password</label>
                   <input type="password" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} className={inputClass} />
                 </div>
               </div>
@@ -217,7 +217,7 @@ export default function Profile() {
               <button
                 type="submit"
                 disabled={saving}
-                className={`px-12 py-4 text-[10px] uppercase tracking-[0.3em] font-semibold transition-all duration-300 ${
+                className={`px-12 py-4 text-xs uppercase tracking-[0.3em] font-semibold transition-all duration-300 ${
                   saving
                     ? 'bg-white/30 text-white/50 cursor-not-allowed'
                     : 'bg-white text-black hover:bg-luxury-gold hover:text-white'

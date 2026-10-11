@@ -21,6 +21,12 @@ const getCart = asyncHandler(async (req, res) => {
 // @access  Private
 const addToCart = asyncHandler(async (req, res) => {
   const { productId, quantity = 1 } = req.body;
+
+  if (!Number.isInteger(quantity) || quantity < 1) {
+    res.status(400);
+    throw new Error('Quantity must be a positive whole number');
+  }
+
   const user = await User.findById(req.user._id);
 
   if (!user) {
@@ -101,6 +107,12 @@ const clearCart = asyncHandler(async (req, res) => {
 // @access  Private
 const updateCartQuantity = asyncHandler(async (req, res) => {
   const { quantity } = req.body;
+
+  if (!Number.isInteger(quantity) || quantity < 0) {
+    res.status(400);
+    throw new Error('Quantity must be a whole number');
+  }
+
   const user = await User.findById(req.user._id);
 
   if (!user) {

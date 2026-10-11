@@ -18,14 +18,14 @@ export default function Hero() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 }}
         >
-          <span className="text-luxury-gold uppercase tracking-[0.4em] text-[10px] mb-8 font-light block">
+          <span className="text-luxury-gold uppercase tracking-[0.4em] text-xs mb-8 font-light block">
             The New Standard
           </span>
           <h1 className="text-5xl lg:text-7xl font-serif leading-tight tracking-wide mb-8 text-white font-light">
             Elegance <br />
             <span className="italic text-white/70">Redefined.</span>
           </h1>
-          <p className="text-sm text-white/40 font-light max-w-sm mb-12 leading-relaxed tracking-wide">
+          <p className="text-sm text-white/50 font-light max-w-sm mb-12 leading-relaxed tracking-wide">
             A meticulous exploration of form and function. Crafted from high-grade titanium and finished with profound attention to detail.
           </p>
           
@@ -34,7 +34,7 @@ export default function Hero() {
               onClick={() => document.getElementById('masterpieces')?.scrollIntoView({ behavior: 'smooth' })}
               className="group flex items-center gap-4 pb-2 border-b border-white/20 hover:border-white transition-colors"
             >
-              <span className="text-[11px] uppercase tracking-[0.2em] text-white">Explore Collection</span>
+              <span className="text-[13px] uppercase tracking-[0.2em] text-white">Explore Collection</span>
             </button>
           </div>
         </motion.div>
@@ -49,7 +49,8 @@ export default function Hero() {
         >
           <div className="w-full h-full relative overflow-hidden bg-luxury-charcoal">
             {/* High-end unplash watch image */}
-            <img 
+            <img
+              fetchPriority="high"
               src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=1200&auto=format&fit=crop" 
               alt="Veloura Signature Timepiece" 
               className="absolute inset-0 w-full h-full object-cover object-center opacity-80"
@@ -68,7 +69,7 @@ export default function Hero() {
         transition={{ delay: 1.5, duration: 1 }}
         className="absolute bottom-8 left-6 lg:left-12 flex items-center gap-4"
       >
-        <span className="text-white/30 text-[9px] uppercase tracking-[0.3em]">Scroll</span>
+        <span className="text-white/40 text-[11px] uppercase tracking-[0.3em]">Scroll</span>
         <div className="w-12 h-[1px] bg-white/10 relative overflow-hidden">
           <motion.div 
             animate={{ x: ["-100%", "100%"] }}

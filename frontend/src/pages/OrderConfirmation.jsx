@@ -35,7 +35,7 @@ export default function OrderConfirmation() {
   if (loading) {
     return (
       <div className="min-h-screen bg-luxury-black flex items-center justify-center">
-        <div className="text-white/50 text-[10px] uppercase tracking-[0.3em]">Loading...</div>
+        <div className="text-white/50 text-xs uppercase tracking-[0.3em]">Loading...</div>
       </div>
     );
   }
@@ -43,8 +43,8 @@ export default function OrderConfirmation() {
   if (!order) {
     return (
       <div className="min-h-screen bg-luxury-black flex items-center justify-center flex-col gap-6">
-        <div className="text-white/50 text-[10px] uppercase tracking-[0.3em]">Order Not Found</div>
-        <Link to="/" className="text-white text-[10px] uppercase tracking-[0.3em] border-b border-white/30 pb-1 hover:border-white transition-colors">
+        <div className="text-white/50 text-xs uppercase tracking-[0.3em]">Order Not Found</div>
+        <Link to="/" className="text-white text-xs uppercase tracking-[0.3em] border-b border-white/30 pb-1 hover:border-white transition-colors">
           Return Home
         </Link>
       </div>
@@ -65,7 +65,7 @@ export default function OrderConfirmation() {
               <span className="text-luxury-gold text-2xl">✓</span>
             </div>
             <h1 className="text-2xl font-serif tracking-[0.3em] text-white mb-4">ORDER CONFIRMED</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">
+            <p className="text-xs uppercase tracking-[0.2em] text-white/50">
               Thank you for your purchase
             </p>
           </div>
@@ -73,31 +73,31 @@ export default function OrderConfirmation() {
           {/* Order Details */}
           <div className="space-y-8 border-t border-white/10 pt-8">
             <div className="flex justify-between items-center">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-white/50">Order ID</span>
-              <span className="text-xs font-mono text-white/80">{order._id}</span>
+              <span className="text-xs uppercase tracking-[0.2em] text-white/50">Order ID</span>
+              <span className="text-[13px] font-mono text-white/80">{order._id}</span>
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-white/50">Status</span>
-              <span className="text-[10px] uppercase tracking-[0.2em] text-luxury-gold">{order.status}</span>
+              <span className="text-xs uppercase tracking-[0.2em] text-white/50">Status</span>
+              <span className="text-xs uppercase tracking-[0.2em] text-luxury-gold">{order.status}</span>
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-white/50">Date</span>
-              <span className="text-xs text-white/80">{new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              <span className="text-xs uppercase tracking-[0.2em] text-white/50">Date</span>
+              <span className="text-[13px] text-white/80">{new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
             </div>
 
             {/* Items */}
             <div className="border-t border-white/10 pt-6">
-              <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/50 mb-6">Items</h3>
+              <h3 className="text-xs uppercase tracking-[0.2em] text-white/50 mb-6">Items</h3>
               <div className="space-y-4">
                 {order.orderItems.map((item, index) => (
                   <div key={index} className="flex justify-between items-center">
                     <div>
                       <p className="text-sm font-serif text-white">{item.name}</p>
-                      <p className="text-[8px] uppercase tracking-widest text-white/40">Qty: {item.quantity}</p>
+                      <p className="text-[10px] uppercase tracking-widest text-white/50">Qty: {item.quantity}</p>
                     </div>
-                    <p className="text-xs font-mono text-white/80">₹{item.price?.toLocaleString()}</p>
+                    <p className="text-[13px] font-mono text-white/80">₹{item.price?.toLocaleString()}</p>
                   </div>
                 ))}
               </div>
@@ -105,7 +105,7 @@ export default function OrderConfirmation() {
 
             {/* Shipping */}
             <div className="border-t border-white/10 pt-6">
-              <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/50 mb-4">Shipping To</h3>
+              <h3 className="text-xs uppercase tracking-[0.2em] text-white/50 mb-4">Shipping To</h3>
               <p className="text-sm text-white/80">
                 {order.shippingAddress.street}<br />
                 {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}<br />
@@ -116,7 +116,7 @@ export default function OrderConfirmation() {
             {/* Total */}
             <div className="border-t border-white/10 pt-6">
               <div className="flex justify-between items-center">
-                <span className="text-xs uppercase tracking-widest text-white">Total</span>
+                <span className="text-[13px] uppercase tracking-widest text-white">Total</span>
                 <span className="text-lg font-mono tracking-wider text-white">₹{order.totalPrice?.toLocaleString()}</span>
               </div>
             </div>
@@ -126,7 +126,7 @@ export default function OrderConfirmation() {
           <div className="mt-16 text-center">
             <Link 
               to="/" 
-              className="inline-block px-12 py-4 bg-white text-black text-[10px] uppercase tracking-[0.3em] font-semibold hover:bg-luxury-gold hover:text-white transition-all duration-300"
+              className="inline-block px-12 py-4 bg-white text-black text-xs uppercase tracking-[0.3em] font-semibold hover:bg-luxury-gold hover:text-white transition-all duration-300"
             >
               Continue Shopping
             </Link>

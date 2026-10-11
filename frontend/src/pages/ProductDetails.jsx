@@ -31,7 +31,7 @@ export default function ProductDetails() {
   if (loading) {
     return (
       <div className="min-h-screen bg-luxury-black flex items-center justify-center">
-        <div className="text-white/50 text-[10px] uppercase tracking-[0.3em]">Loading...</div>
+        <div className="text-white/50 text-xs uppercase tracking-[0.3em]">Loading...</div>
       </div>
     );
   }
@@ -39,8 +39,8 @@ export default function ProductDetails() {
   if (error || !product) {
     return (
       <div className="min-h-screen bg-luxury-black flex items-center justify-center flex-col gap-6">
-        <div className="text-white/50 text-[10px] uppercase tracking-[0.3em]">Product Not Found</div>
-        <Link to="/" className="text-white text-[10px] uppercase tracking-[0.3em] border-b border-white/30 pb-1 hover:border-white transition-colors">
+        <div className="text-white/50 text-xs uppercase tracking-[0.3em]">Product Not Found</div>
+        <Link to="/" className="text-white text-xs uppercase tracking-[0.3em] border-b border-white/30 pb-1 hover:border-white transition-colors">
           Return Home
         </Link>
       </div>
@@ -50,7 +50,7 @@ export default function ProductDetails() {
   return (
     <div className="min-h-screen pt-32 pb-20 bg-luxury-black">
       <div className="container mx-auto px-6 lg:px-12">
-        <Link to="/" className="inline-block text-[9px] uppercase tracking-[0.3em] text-white/50 hover:text-white transition-colors mb-12">
+        <Link to="/" className="inline-block text-[11px] uppercase tracking-[0.3em] text-white/50 hover:text-white transition-colors mb-12">
           ← Back to Collection
         </Link>
         
@@ -76,7 +76,7 @@ export default function ProductDetails() {
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
             className="w-full lg:w-1/2 flex flex-col justify-center"
           >
-            <p className="text-[10px] uppercase tracking-[0.4em] text-white/40 mb-4">{product.brand} | {product.category}</p>
+            <p className="text-xs uppercase tracking-[0.4em] text-white/50 mb-4">{product.brand} | {product.category}</p>
             <h1 className="text-4xl md:text-5xl font-serif text-white tracking-wide mb-6">{product.name}</h1>
             <p className="text-2xl font-sans text-white/80 tracking-wider mb-10">₹{product.price?.toLocaleString()}</p>
             
@@ -87,7 +87,7 @@ export default function ProductDetails() {
             </div>
 
             <div className="flex flex-col gap-6">
-              <div className="flex justify-between items-center text-[10px] uppercase tracking-[0.2em] text-white/50 border-b border-white/10 pb-4">
+              <div className="flex justify-between items-center text-xs uppercase tracking-[0.2em] text-white/50 border-b border-white/10 pb-4">
                 <span>Availability</span>
                 <span className={product.stockQuantity > 0 ? 'text-luxury-gold' : 'text-red-500'}>
                   {product.stockQuantity > 0 ? 'In Stock' : 'Out of Stock'}
@@ -101,10 +101,10 @@ export default function ProductDetails() {
                   <button 
                     onClick={() => addToCart(product)}
                     disabled={product.stockQuantity === 0 || maxReached}
-                    className={`w-full py-5 text-[10px] uppercase tracking-[0.3em] font-semibold transition-all duration-300 ${
+                    className={`w-full py-5 text-xs uppercase tracking-[0.3em] font-semibold transition-all duration-300 ${
                       product.stockQuantity > 0 && !maxReached
                         ? 'bg-white text-black hover:bg-luxury-gold hover:text-white' 
-                        : 'bg-white/10 text-white/30 cursor-not-allowed'
+                        : 'bg-white/10 text-white/40 cursor-not-allowed'
                     }`}
                   >
                     {maxReached ? 'Max Stock in Cart' : 'Add to Cart'}

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import SmartSearch from '../components/SmartSearch';
@@ -12,7 +13,9 @@ export default function MainLayout() {
       <CartDrawer />
       
       <main className="min-h-screen">
-        <Outlet />
+        <Suspense fallback={<div className="min-h-screen" />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <Footer />

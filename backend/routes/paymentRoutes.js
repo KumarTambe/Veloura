@@ -7,12 +7,8 @@ import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+// create-order also returns the Razorpay key ID for the checkout modal
 router.route('/create-order').post(protect, createRazorpayOrder);
 router.route('/verify').post(protect, verifyRazorpayPayment);
-
-// Send Razorpay Key ID to frontend securely
-router.route('/key').get(protect, (req, res) => {
-  res.json({ keyId: process.env.RAZORPAY_KEY_ID });
-});
 
 export default router;

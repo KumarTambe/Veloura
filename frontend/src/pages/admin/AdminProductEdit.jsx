@@ -87,7 +87,7 @@ export default function AdminProductEdit() {
 
         <form onSubmit={submitHandler} className="space-y-6">
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-widest text-white/50">Name</label>
+            <label className="text-[13px] uppercase tracking-widest text-white/50">Name</label>
             <input
               type="text"
               value={name}
@@ -99,7 +99,7 @@ export default function AdminProductEdit() {
 
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-xs uppercase tracking-widest text-white/50">Price (₹)</label>
+              <label className="text-[13px] uppercase tracking-widest text-white/50">Price (₹)</label>
               <input
                 type="number"
                 value={price}
@@ -109,7 +109,7 @@ export default function AdminProductEdit() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs uppercase tracking-widest text-white/50">Stock Quantity</label>
+              <label className="text-[13px] uppercase tracking-widest text-white/50">Stock Quantity</label>
               <input
                 type="number"
                 value={stockQuantity}
@@ -121,7 +121,7 @@ export default function AdminProductEdit() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-widest text-white/50">Images (Comma separated URLs)</label>
+            <label className="text-[13px] uppercase tracking-widest text-white/50">Images (Comma separated URLs)</label>
             <input
               type="text"
               value={images}
@@ -132,7 +132,7 @@ export default function AdminProductEdit() {
 
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-xs uppercase tracking-widest text-white/50">Brand</label>
+              <label className="text-[13px] uppercase tracking-widest text-white/50">Brand</label>
               <input
                 type="text"
                 value={brand}
@@ -142,7 +142,7 @@ export default function AdminProductEdit() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs uppercase tracking-widest text-white/50">Category</label>
+              <label className="text-[13px] uppercase tracking-widest text-white/50">Category</label>
               <input
                 type="text"
                 value={category}
@@ -154,7 +154,7 @@ export default function AdminProductEdit() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-widest text-white/50">Description</label>
+            <label className="text-[13px] uppercase tracking-widest text-white/50">Description</label>
             <textarea
               rows="5"
               value={description}

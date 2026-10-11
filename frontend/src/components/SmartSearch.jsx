@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, ArrowRight } from 'lucide-react';
+import { Search, ArrowRight } from 'lucide-react';
 import { API_URL } from '../config/api';
 
 export default function SmartSearch() {
@@ -41,7 +41,7 @@ export default function SmartSearch() {
 
       setLoading(true);
       try {
-        const res = await fetch(`${API_URL}/api/products?search=${query}`);
+        const res = await fetch(`${API_URL}/api/products?search=${encodeURIComponent(query)}`);
         const data = await res.json();
         setResults(data.products || []);
       } catch (error) {
@@ -88,7 +88,7 @@ export default function SmartSearch() {
                 />
                 <button 
                   onClick={() => setIsOpen(false)}
-                  className="text-white/50 hover:text-white transition-colors p-2 bg-white/5 rounded-md text-xs tracking-widest uppercase font-semibold"
+                  className="text-white/50 hover:text-white transition-colors p-2 bg-white/5 rounded-md text-[13px] tracking-widest uppercase font-semibold"
                 >
                   ESC
                 </button>
@@ -96,7 +96,7 @@ export default function SmartSearch() {
 
               {query.length < 2 ? (
                 <div className="pt-6">
-                  <h3 className="text-xs uppercase tracking-widest text-white/40 mb-4 font-sans">Trending Suggestions</h3>
+                  <h3 className="text-[13px] uppercase tracking-widest text-white/50 mb-4 font-sans">Trending Suggestions</h3>
                   <div className="flex flex-wrap gap-2">
                     {suggestions.map((item) => (
                       <button 
@@ -112,13 +112,13 @@ export default function SmartSearch() {
               ) : (
                 <div className="pt-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xs uppercase tracking-widest text-white/40 font-sans">Results for "{query}"</h3>
+                    <h3 className="text-[13px] uppercase tracking-widest text-white/50 font-sans">Results for "{query}"</h3>
                     {loading && <div className="w-4 h-4 border-2 border-luxury-gold border-t-transparent rounded-full animate-spin"></div>}
                   </div>
                   
                   <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                     {!loading && results.length === 0 ? (
-                      <p className="text-white/30 text-sm italic py-4 text-center font-serif">No timepieces found matching your search.</p>
+                      <p className="text-white/40 text-sm italic py-4 text-center font-serif">No timepieces found matching your search.</p>
                     ) : (
                       results.map((product) => (
                         <Link 
@@ -129,14 +129,14 @@ export default function SmartSearch() {
                         >
                           <div className="flex items-center space-x-4">
                             <div className="w-12 h-12 bg-luxury-charcoal rounded-md overflow-hidden">
-                              <img src={product.images?.[0]} alt={product.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                              <img loading="lazy" decoding="async" src={product.images?.[0]} alt={product.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                             </div>
                             <div>
                               <h4 className="font-serif text-white group-hover:text-luxury-gold transition-colors">{product.name}</h4>
-                              <p className="text-[10px] uppercase tracking-widest text-white/40">{product.brand} • ₹{product.price?.toLocaleString()}</p>
+                              <p className="text-xs uppercase tracking-widest text-white/50">{product.brand} • ₹{product.price?.toLocaleString()}</p>
                             </div>
                           </div>
-                          <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                          <ArrowRight className="w-4 h-4 text-white/40 group-hover:text-white group-hover:translate-x-1 transition-all" />
                         </Link>
                       ))
                     )}

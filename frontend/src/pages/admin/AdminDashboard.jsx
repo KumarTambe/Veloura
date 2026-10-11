@@ -121,7 +121,7 @@ export default function AdminDashboard() {
               className="p-6 bg-white/5 border border-white/10"
             >
               <div className="flex justify-between items-start mb-4">
-                <p className="text-white/50 text-xs uppercase tracking-widest">{stat.title}</p>
+                <p className="text-white/50 text-[13px] uppercase tracking-widest">{stat.title}</p>
                 <stat.icon size={20} className={stat.color} strokeWidth={1.5} />
               </div>
               <h3 className="text-3xl font-serif">{stat.value}</h3>

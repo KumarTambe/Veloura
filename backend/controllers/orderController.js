@@ -1,55 +1,14 @@
 import asyncHandler from 'express-async-handler';
 import Order from '../models/Order.js';
-import User from '../models/User.js';
-import Product from '../models/Product.js';
 
-// @desc    Create new order
-// @route   POST /api/orders
-// @access  Private
-const createOrder = asyncHandler(async (req, res) => {
-  const { orderItems, shippingAddress, paymentMethod, totalPrice, paymentResult } = req.body;
-
-  if (!orderItems || orderItems.length === 0) {
-    res.status(400);
-    throw new Error('No order items');
-  }
-
-  const order = new Order({
-    user: req.user._id,
-    orderItems,
-    shippingAddress,
-    paymentMethod,
-    totalPrice,
-    isPaid: true,
-    paidAt: Date.now(),
-    paymentResult,
-    status: 'Processing',
-  });
-
-  const createdOrder = await order.save();
-
-  // Reduce stock quantity for each product
-  for (const item of orderItems) {
-    const product = await Product.findById(item.product);
-    if (product) {
-      product.stockQuantity = Math.max(0, product.stockQuantity - item.quantity);
-      await product.save();
-    }
-  }
-
-  // Clear user's cart after successful order
-  const user = await User.findById(req.user._id);
-  user.cart = [];
-  await user.save();
-
-  res.status(201).json(createdOrder);
-});
+// Orders are created by POST /api/payment/create-order and marked paid by /verify
 
 // @desc    Get logged-in user's orders
 // @route   GET /api/orders/myorders
 // @access  Private
 const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
+  // Hide checkouts the user started but never paid for
+  const orders = await Order.find({ user: req.user._id, status: { $ne: 'Pending' } }).sort({ createdAt: -1 });
   res.json(orders);
 });
 
@@ -61,8 +20,8 @@ const getOrderById = asyncHandler(async (req, res) => {
 
   if (order) {
     // Only allow the order's owner to view it (or admin)
-    if (order.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      res.status(401);
+    if (order.user?._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      res.status(403);
       throw new Error('Not authorized to view this order');
     }
     res.json(order);
@@ -87,6 +46,10 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
 
   if (order) {
+    if (!order.isPaid) {
+      res.status(400);
+      throw new Error('Cannot deliver an unpaid order');
+    }
     order.isDelivered = true;
     order.deliveredAt = Date.now();
     order.status = 'Delivered';
@@ -99,4 +62,4 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
   }
 });
 
-export { createOrder, getMyOrders, getOrderById, getOrders, updateOrderToDelivered };
+export { getMyOrders, getOrderById, getOrders, updateOrderToDelivered };

@@ -12,20 +12,22 @@ const getProducts = asyncHandler(async (req, res) => {
 
   // Search by name or description (case-insensitive)
   if (search) {
+    // Escape regex metacharacters so user input is matched literally
+    const pattern = String(search).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     filter.$or = [
-      { name: { $regex: search, $options: 'i' } },
-      { description: { $regex: search, $options: 'i' } },
+      { name: { $regex: pattern, $options: 'i' } },
+      { description: { $regex: pattern, $options: 'i' } },
     ];
   }
 
   // Filter by category
   if (category) {
-    filter.category = category;
+    filter.category = String(category);
   }
 
   // Filter by brand
   if (brand) {
-    filter.brand = brand;
+    filter.brand = String(brand);
   }
 
   // Filter by price range
@@ -57,11 +59,12 @@ const getProducts = asyncHandler(async (req, res) => {
       sortOption = { createdAt: -1 };
   }
 
-  const products = await Product.find(filter).sort(sortOption);
-
   // Also return distinct categories and brands for filter dropdowns
-  const categories = await Product.distinct('category');
-  const brands = await Product.distinct('brand');
+  const [products, categories, brands] = await Promise.all([
+    Product.find(filter).sort(sortOption),
+    Product.distinct('category'),
+    Product.distinct('brand'),
+  ]);
 
   res.json({ products, categories, brands });
 });

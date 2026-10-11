@@ -20,16 +20,16 @@ export default function ProductShowcase() {
             style={{ y: yText }}
             className="w-full aspect-[3/4] lg:aspect-square bg-luxury-charcoal relative overflow-hidden"
           >
-            <img 
+            <img loading="lazy" decoding="async" 
               src="https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=1000&auto=format&fit=crop" 
               alt="Veloura Precision Core" 
-              className="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-luminosity"
+              className="absolute inset-0 w-full h-full object-cover opacity-80 grayscale"
             />
           </motion.div>
 
           {/* Minimal Specs */}
           <div className="flex flex-col justify-center">
-            <h3 className="text-[10px] uppercase tracking-[0.4em] text-white/40 mb-6">Specifications</h3>
+            <h3 className="text-xs uppercase tracking-[0.4em] text-white/50 mb-6">Specifications</h3>
             <h4 className="text-3xl font-serif text-white mb-16 font-light tracking-wide">
               The Architecture <br />
               <span className="text-white/50 italic">of Time.</span>
@@ -44,11 +44,11 @@ export default function ProductShowcase() {
               ].map((spec) => (
                 <div key={spec.num} className="flex flex-col py-6 border-b border-white/10 group">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="text-white/30 text-[9px] uppercase tracking-[0.2em] font-mono">{spec.num}</span>
-                    <span className="text-white/80 text-xs uppercase tracking-[0.2em]">{spec.title}</span>
+                    <span className="text-white/40 text-[11px] uppercase tracking-[0.2em] font-mono">{spec.num}</span>
+                    <span className="text-white/80 text-[13px] uppercase tracking-[0.2em]">{spec.title}</span>
                   </div>
                   <div className="flex justify-end">
-                    <span className="text-white/40 text-sm font-serif italic opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <span className="text-white/50 text-sm font-serif italic opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                       {spec.desc}
                     </span>
                   </div>

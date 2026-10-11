@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Package, CheckCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { API_URL } from '../../config/api';
 
 export default function AdminOrders() {
@@ -8,25 +8,31 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  const fetchOrders = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/orders`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      const data = await res.json();
-      setOrders(data);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [reloadKey, setReloadKey] = useState(0);
+  const fetchOrders = () => setReloadKey((k) => k + 1);
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/orders`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+        const data = await res.json();
+        if (!cancelled && Array.isArray(data)) setOrders(data);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [user.token, reloadKey]);
 
   const handleDeliver = async (id) => {
     try {
@@ -60,7 +66,7 @@ export default function AdminOrders() {
 
         <div className="overflow-x-auto border border-white/10">
           <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-white/5 border-b border-white/10 uppercase tracking-widest text-[10px] text-white/50">
+            <thead className="bg-white/5 border-b border-white/10 uppercase tracking-widest text-xs text-white/50">
               <tr>
                 <th className="p-4">ID</th>
                 <th className="p-4">User</th>
@@ -87,11 +93,11 @@ export default function AdminOrders() {
                   </td>
                   <td className="p-4">
                     {order.isDelivered ? (
-                      <span className="px-2 py-1 text-[10px] uppercase tracking-wider bg-green-500/10 text-green-500">
+                      <span className="px-2 py-1 text-xs uppercase tracking-wider bg-green-500/10 text-green-500">
                         Delivered
                       </span>
                     ) : (
-                      <span className="px-2 py-1 text-[10px] uppercase tracking-wider bg-yellow-500/10 text-yellow-500">
+                      <span className="px-2 py-1 text-xs uppercase tracking-wider bg-yellow-500/10 text-yellow-500">
                         Pending
                       </span>
                     )}
@@ -100,7 +106,7 @@ export default function AdminOrders() {
                     {!order.isDelivered && (
                       <button 
                         onClick={() => handleDeliver(order._id)}
-                        className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-luxury-gold hover:text-white transition-colors"
+                        className="flex items-center gap-1 text-xs uppercase tracking-widest text-luxury-gold hover:text-white transition-colors"
                       >
                         <CheckCircle size={14} />
                         Mark Delivered
